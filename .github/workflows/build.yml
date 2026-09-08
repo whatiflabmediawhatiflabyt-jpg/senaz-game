@@ -14,15 +14,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
-      - name: Install Capacitor & Build
+      - name: Install Dependencies & Init Capacitor
         run: |
           npm init -y
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "Pro Futbol Kariyeri" "com.azisengezer.futbolkariyeri" --web-dir .
-          yes | npx cap add android || true
-          npx cap sync android
+          npx cap add android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
