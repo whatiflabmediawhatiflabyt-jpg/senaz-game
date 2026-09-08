@@ -22,14 +22,16 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Create Package JSON & Install
+      - name: Prepare Web Directory & Capacitor
         run: |
+          mkdir -p www
+          cp index.html www/
           echo '{"name":"futbol-oyunu","version":"1.0.0","private":true}' > package.json
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Init & Sync Capacitor
         run: |
-          npx cap init "Pro Futbol Kariyeri" "com.azisengezer.futbolkariyeri" --web-dir .
+          npx cap init "Pro Futbol Kariyeri" "com.azisengezer.futbolkariyeri" --web-dir www
           npx cap add android
           npx cap sync android
 
