@@ -11,32 +11,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Dependencies & Init Capacitor
-        run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "Pro Futbol Kariyeri" "com.azisengezer.futbolkariyeri" --web-dir .
-          npx cap add android
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create Package JSON & Install
+        run: |
+          echo '{"name":"futbol-oyunu","version":"1.0.0","private":true}' > package.json
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Init & Sync Capacitor
+        run: |
+          npx cap init "Pro Futbol Kariyeri" "com.azisengezer.futbolkariyeri" --web-dir .
+          npx cap add android
+          npx cap sync android
+
       - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
