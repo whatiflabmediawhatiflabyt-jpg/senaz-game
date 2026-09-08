@@ -1,0 +1,2704 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Futbolcu Kariyeri v37.0 Master Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.4);
+            --gold: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.4);
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --danger: #f43f5e;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --pink: #ec4899;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #030712 70%); 
+            color: var(--text); 
+            padding: 12px 8px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+        .container { width: 100%; max-width: 1240px; display: flex; flex-direction: column; gap: 12px; }
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 16px; 
+            padding: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+            backdrop-filter: blur(16px); 
+            margin-bottom: 8px; 
+            transition: border-color 0.3s ease;
+        }
+        h1, h2, h3, h4 { color: var(--accent); margin-bottom: 8px; font-weight: 800; letter-spacing: -0.02em; }
+        p { color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem; line-height: 1.4; }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; color: var(--text); font-weight: 600; font-size: 0.85rem; }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            background: rgba(3, 7, 18, 0.6); 
+            border: 1px solid var(--border); 
+            color: var(--text); 
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        
+        .btn { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; border: none; padding: 12px 16px; 
+            font-size: 0.88rem; font-weight: 700; border-radius: 10px; 
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            width: 100%; box-shadow: 0 4px 14px var(--accent-glow); 
+            display: inline-flex; justify-content: center; align-items: center; gap: 8px;
+            min-height: 44px;
+        }
+        .btn:hover { transform: translateY(-2px) scale(1.01); filter: brightness(1.15); box-shadow: 0 8px 20px var(--accent-glow); }
+        .btn:active { transform: translateY(1px) scale(0.98); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; filter: grayscale(1); }
+        
+        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: #000; box-shadow: 0 4px 14px var(--gold-glow); }
+        .btn-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 4px 14px rgba(59,130,246,0.3); }
+        .btn-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); box-shadow: 0 4px 14px rgba(168,85,247,0.3); }
+        .btn-danger { background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 4px 14px rgba(244,63,94,0.3); }
+        .btn-pink { background: linear-gradient(135deg, #ec4899, #be185d); box-shadow: 0 4px 14px rgba(236,72,153,0.3); }
+
+        .hidden { display: none !important; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .stat-item { 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 10px 12px; 
+            border-radius: 10px; 
+            border: 1px solid var(--card-border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.85rem; 
+        }
+        
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 14px; gap: 12px;}
+        
+        .fut-card { 
+            background: linear-gradient(135deg, #fef08a, #f59e0b, #78350f); 
+            color: #0f172a; 
+            border-radius: 14px; 
+            padding: 10px; 
+            width: 130px; 
+            flex-shrink: 0;
+            text-align: center; 
+            font-weight: 800; 
+            border: 2px solid #fef08a; 
+            box-shadow: 0 10px 30px var(--gold-glow); 
+            position: relative; 
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: transform 0.3s ease;
+        }
+        .fut-card .ovr { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+        .fut-card .pos { font-size: 0.95rem; text-transform: uppercase; }
+        .fut-card .number-badge { position: absolute; top: 6px; right: 6px; font-size: 0.75rem; background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 5px; color: #fff; }
+        .fut-card .name { font-size: 0.8rem; margin-top: 4px; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .pitch { 
+            background: radial-gradient(circle, #16a34a 0%, #14532d 100%); 
+            border: 2px solid rgba(255,255,255,0.6); 
+            border-radius: 12px; 
+            height: 160px; 
+            width: 100%; 
+            position: relative; 
+            overflow: hidden; 
+            margin-bottom: 12px; 
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.3); 
+        }
+        .pitch-line { position: absolute; background: rgba(255,255,255,0.4); }
+        .center-line { width: 2px; height: 100%; left: 50%; top: 0; }
+        .center-circle { width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); position: absolute; }
+        .ball { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transition: all 0.5s ease; box-shadow: 0 0 8px #fff; z-index: 10; }
+        .player-dot { width: 16px; height: 16px; background: var(--gold); border-radius: 50%; position: absolute; top: 50%; left: 20%; transition: all 0.5s ease; border: 2px solid #000; box-shadow: 0 0 10px var(--gold-glow); z-index: 9; }
+
+        /* TAKTİK İLK 11 SAHASI STİLLERİ */
+        .tactical-pitch {
+            background: radial-gradient(circle, #15803d 0%, #14532d 100%);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            height: 440px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 14px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .tactical-pitch .field-line { position: absolute; background: rgba(255, 255, 255, 0.35); }
+        .tactical-center-line { height: 2px; width: 100%; top: 50%; left: 0; }
+        .tactical-center-circle { width: 80px; height: 80px; border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); position: absolute; }
+        .penalty-area-top { width: 50%; height: 18%; border: 2px solid rgba(255, 255, 255, 0.35); border-top: none; top: 0; left: 25%; position: absolute; }
+        .penalty-area-bottom { width: 50%; height: 18%; border: 2px solid rgba(255, 255, 255, 0.35); border-bottom: none; bottom: 0; left: 25%; position: absolute; }
+
+        .tactical-player-card {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 72px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 5px 3px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .tactical-player-card.is-user {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.95), rgba(217, 119, 6, 0.95));
+            color: #0f172a;
+            border: 2px solid #fef08a;
+            box-shadow: 0 0 15px var(--gold-glow);
+            animation: userPulse 2s infinite alternate;
+        }
+        @keyframes userPulse {
+            0% { box-shadow: 0 0 8px var(--gold-glow); }
+            100% { box-shadow: 0 0 20px var(--gold-glow), 0 0 10px #fef08a; }
+        }
+        .tactical-player-card .t-ovr { font-size: 0.85rem; font-weight: 900; line-height: 1; color: var(--gold); }
+        .tactical-player-card.is-user .t-ovr { color: #000; }
+        .tactical-player-card .t-pos { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; color: var(--accent); margin: 1px 0; }
+        .tactical-player-card.is-user .t-pos { color: #0f172a; }
+        .tactical-player-card .t-name { 
+            font-size: 0.65rem; 
+            font-weight: 700; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            padding-top: 2px; 
+            margin-top: 2px; 
+            color: #fff;
+        }
+        .tactical-player-card.is-user .t-name { border-top-color: rgba(0,0,0,0.2); color: #0f172a; }
+
+        .progress-bg { background: rgba(255,255,255,0.08); border-radius: 20px; height: 8px; width: 70px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #10b981, #34d399); height: 100%; border-radius: 20px; transition: width 0.4s ease; }
+        .progress-fill-gold { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+        .log-box { 
+            background: rgba(3, 7, 18, 0.85); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 12px; 
+            height: 130px; 
+            overflow-y: auto; 
+            font-family: 'Consolas', monospace; 
+            font-size: 0.8rem; 
+            color: #6ee7b7; 
+            margin-bottom: 12px; 
+            line-height: 1.5; 
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+        }
+        
+        .tab-buttons { 
+            display: flex; 
+            gap: 6px; 
+            margin-bottom: 14px; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            padding-bottom: 6px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+        .tab-buttons::-webkit-scrollbar { height: 4px; }
+        .tab-buttons::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        .tab-btn { 
+            background: rgba(31, 41, 55, 0.7); 
+            border: 1px solid var(--card-border); 
+            color: var(--text-muted); 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            flex: 0 0 auto;
+            font-weight: 700; 
+            text-align: center; 
+            font-size: 0.78rem; 
+            transition: all 0.2s ease; 
+        }
+        .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        
+        .sub-tab-btn { background: rgba(31, 41, 55, 0.6); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.2s ease; flex: 1; }
+        .sub-tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+        .badge { background: var(--gold); color: #000; padding: 3px 8px; border-radius: 5px; font-weight: 800; font-size: 0.68rem; margin-right: 4px; display: inline-block; margin-bottom: 4px; }
+        .badge-purple { background: var(--purple); color: #fff; }
+        .badge-blue { background: var(--blue); color: #fff; }
+        .badge-pink { background: var(--pink); color: #fff; }
+        .badge-danger { background: var(--danger); color: #fff; }
+
+        .ad-banner { background: linear-gradient(90deg, #312e81, #4338ca); border: 1px dashed var(--purple); color: #e0e7ff; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: 10px; margin-bottom: 10px; }
+        .save-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--card-border); font-size: 0.8rem; flex-wrap: wrap; gap: 8px; }
+
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 8px; text-align: left; min-width: 480px; }
+        .leaderboard-table th { background: rgba(31, 41, 55, 0.8); color: var(--gold); padding: 10px 8px; border-bottom: 2px solid var(--border); font-size: 0.8rem; }
+        .leaderboard-table td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; }
+        .leaderboard-table tr.user-row { background: rgba(251, 191, 36, 0.15); font-weight: bold; border-left: 4px solid var(--gold); }
+
+        .league-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.8rem; text-align: center; min-width: 450px; }
+        .league-table th { background: #111827; color: var(--gold); padding: 8px 5px; border: 1px solid var(--border); }
+        .league-table td { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .league-table tr:nth-child(even) { background: rgba(0,0,0,0.2); }
+        .league-table tr.my-team { background: rgba(251, 191, 36, 0.2) !important; font-weight: bold; }
+
+        .zone-ucl { border-left: 4px solid #3b82f6 !important; }
+        .zone-uel { border-left: 4px solid #f59e0b !important; }
+        .zone-uecl { border-left: 4px solid #10b981 !important; }
+        .zone-relegation { border-left: 4px solid #f43f5e !important; }
+
+        .fixture-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .fixture-teams { display: flex; align-items: center; gap: 6px; flex: 1; }
+        .fixture-vs { font-weight: bold; color: var(--gold); padding: 0 6px; }
+        .fixture-score { background: var(--border); padding: 3px 8px; border-radius: 5px; font-weight: bold; color: var(--accent); }
+        .current-match-highlight { border: 1px solid var(--gold) !important; background: rgba(251, 191, 36, 0.12) !important; }
+        
+        .legend-box { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 0.72rem; color: var(--text-muted); }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-color { width: 10px; height: 10px; border-radius: 2px; }
+
+        .skill-category-title { font-size: 1rem; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin: 14px 0 10px 0; grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 7, 18, 0.88); display: flex; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(12px); padding: 12px; }
+        .modal-box { background: #0f172a; border: 2px solid var(--gold); border-radius: 16px; padding: 20px 16px; width: 100%; max-width: 550px; text-align: center; box-shadow: 0 0 40px var(--gold-glow); max-height: 90vh; overflow-y: auto; }
+        .toty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; text-align: center; font-size: 0.78rem; }
+        .toty-card { background: rgba(251, 191, 36, 0.12); border: 1px solid var(--gold); padding: 8px 4px; border-radius: 8px; }
+        .toty-card.user { background: rgba(16, 185, 129, 0.25); border-color: var(--accent); font-weight: bold; }
+
+        /* MOBİL ÖZEL UYARLAMALAR */
+        @media (max-width: 768px) {
+            body { padding: 8px 4px; }
+            .card { padding: 14px; border-radius: 12px; }
+            .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+            .grid-3 { grid-template-columns: 1fr; gap: 8px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 6px; }
+            .dashboard-header { flex-direction: column-reverse; align-items: center; text-align: center; }
+            .fut-card { transform: none !important; width: 120px; }
+            .tactical-pitch { height: 380px; }
+            .tactical-player-card { width: 62px; padding: 4px 2px; }
+            .tactical-player-card .t-ovr { font-size: 0.8rem; }
+            .tactical-player-card .t-pos { font-size: 0.58rem; }
+            .tactical-player-card .t-name { font-size: 0.6rem; }
+            .toty-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 1.4rem; }
+            h2 { font-size: 1.25rem; }
+            h3 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- MODAL PANELERİ -->
+        <div id="modalOverlay" class="modal-overlay hidden">
+            <!-- BALLON D'OR & YILIN 11'İ MODAL -->
+            <div id="ballonModal" class="modal-box hidden">
+                <h2 style="color:var(--gold); font-size: 1.5rem; margin-bottom: 5px;">🏆 BALLON D'OR GALA TÖRENİ</h2>
+                <p id="ballonResultText" style="color:var(--text); font-size: 0.95rem; margin-bottom: 12px;"></p>
+                
+                <h4 style="color:var(--accent); margin-top: 10px;">🌟 FIFA Yılın 11'i (TOTY)</h4>
+                <div class="toty-grid" id="totyGridContainer"></div>
+
+                <button class="btn btn-gold" onclick="closeModal()">Töreni Tamamla & Sezona Başla 🚀</button>
+            </div>
+
+            <!-- DÜNYA KUPASI / EURO TURNUVA MODAL -->
+            <div id="nationalModal" class="modal-box hidden" style="border-color: var(--danger); box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);">
+                <h2 style="color:var(--danger); font-size: 1.5rem; margin-bottom: 5px;" id="nationalCupTitle">🇹🇷 MİLLİ TAKIM TURNUVA FİKSTÜRÜ</h2>
+                <p style="color:var(--text);" id="nationalCupSub">A Milli Takım formasıyla kupaya giden yol!</p>
+                
+                <div class="card" style="padding:10px; margin:10px 0; border-color:var(--danger); text-align:left;">
+                    <p>Milli Takım Hoca Güveni: <strong id="natCoachTrustModal" style="color:var(--gold);">%50</strong></p>
+                    <p id="natCaptainModalStatus">Kaptanlık Durumu: <strong style="color:var(--text-muted);">Normal Oyuncu</strong></p>
+                    <div style="display:flex; gap:6px; margin-top:8px; flex-direction:column;">
+                        <button class="btn btn-gold" style="padding:6px 10px; font-size:0.78rem;" onclick="praiseNationalCoach()">🗣️ Milli Hocayı Öv (+10 Güven)</button>
+                        <button class="btn btn-purple" style="padding:6px 10px; font-size:0.78rem;" onclick="claimNationalCaptaincy()">👑 Kaptanlık Bandını Talep Et</button>
+                    </div>
+                </div>
+
+                <div id="nationalFixtureBox" style="margin: 12px 0;"></div>
+
+                <div class="grid-2" id="nationalActionBtns">
+                    <button class="btn btn-danger" onclick="playNationalMatch()">⚽ Milli Maça Çık!</button>
+                    <button class="btn btn-blue" onclick="closeModal()">Kapat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KARAKTER OLUŞTURMA -->
+        <div id="setup-screen" class="card">
+            <h1>⚽ Pro Futbolcu Kariyeri v37.0 Master Edition</h1>
+            <p>Mobil Uyumlu Arayüz, Zengin Skill Tree, Sakatlık Tedavisi & Milli Takım Kaptanlığı</p>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Ad Soyad:</label>
+                    <input type="text" id="playerName" value="Aziz Şengezer">
+                </div>
+                <div class="form-group">
+                    <label>Forma Numarası (1-99):</label>
+                    <input type="number" id="playerKitNumber" value="10" min="1" max="99">
+                </div>
+            </div>
+            
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Yaş Seçimi (16-23):</label>
+                    <input type="number" id="playerAge" value="17" min="16" max="23">
+                </div>
+                <div class="form-group">
+                    <label>Mevki:</label>
+                    <select id="playerPos">
+                        <option value="ST">Forvet (ST)</option>
+                        <option value="CAM">Ofansif Orta Saha (CAM)</option>
+                        <option value="RW">Sağ Kanat (RW)</option>
+                        <option value="LW">Sol Kanat (LW)</option>
+                        <option value="CM">Merkez Orta Saha (CM)</option>
+                        <option value="CB">Stoper (CB)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Başlangıç Sözleşmesi (Yıl):</label>
+                    <select id="initialContractYears">
+                        <option value="1">1 Yıl (Bosman Kuralına Yakın)</option>
+                        <option value="3" selected>3 Yıl Standart</option>
+                        <option value="5">5 Yıl Uzun Vadeli</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Lig Seçimi:</label>
+                    <select id="leagueSelect" onchange="updateClubOptions()">
+                        <option value="Türkiye Süper Ligi">Türkiye Süper Ligi 🇹🇷</option>
+                        <option value="İngiltere 1. Ligi">İngiltere 1. Ligi 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
+                        <option value="İspanya Ligi">İspanya Ligi 🇪🇸</option>
+                        <option value="İtalya Ligi">İtalya Ligi 🇮🇹</option>
+                        <option value="Almanya Ligi">Almanya Ligi 🇩🇪</option>
+                        <option value="Fransa Ligi">Fransa Ligi 🇫🇷</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Başlangıç Takımı:</label>
+                    <select id="clubSelect"></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Menajer Tipi:</label>
+                <select id="agentSelect">
+                    <option value="Agresif Mino">Mino (Agresif - Yüksek Maaş Teklifleri)</option>
+                    <option value="Prestijli Jorge">Jorge (Prestijli - Dev Kulüplere Transfer)</option>
+                    <option value="Aile Menajeri">Babam/Ailem (Mütevazı - Yüksek Sadakat)</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="startGame()">Efsanevi Kariyeri Başlat 🚀</button>
+            <button class="btn btn-blue" style="margin-top: 8px;" onclick="loadGame()">Kayıtlı Oyunu Yükle 💾</button>
+        </div>
+
+        <!-- ANA OYUN EKRANI -->
+        <div id="game-screen" class="card hidden">
+            <div id="adBannerBox" class="ad-banner">📢 Reklam: Sponsorlu içerikleri kaldırıp hızlı simülasyonu açmak için Mağaza'dan Premium Pass al! ($1)</div>
+
+            <div class="save-bar">
+                <span>💾 Otomatik Kayıt | Sezon: <strong id="dispSeason" style="color:var(--gold);">2026/27</strong></span>
+                <div style="display: flex; gap: 6px;">
+                    <button class="btn btn-blue" style="width: auto; padding: 4px 10px; font-size: 0.72rem; min-height:30px;" onclick="saveGame()">Kaydet</button>
+                    <button class="btn btn-danger" style="width: auto; padding: 4px 10px; font-size: 0.72rem; min-height:30px;" onclick="resetGame()">Sıfırla</button>
+                </div>
+            </div>
+
+            <div class="dashboard-header">
+                <div>
+                    <h2 id="dispName" style="font-size: 1.3rem; margin-bottom: 4px;">Oyuncu Adı</h2>
+                    <p id="dispClubInfo" style="margin-bottom: 6px;">Kulüp: - | Lig: -</p>
+                    <p id="dispEquipInfo" style="margin-bottom: 6px; font-size:0.8rem; color:var(--gold);">Forma #: <span id="dispKitNum">10</span> | Krampon: <span id="dispBoots">Standart Siyah Krampon</span></p>
+                    <p id="dispContractInfo" style="margin-bottom: 6px; font-size:0.8rem; color:var(--purple);">📝 Sözleşme: <strong id="dispContractYears">3 Yıl Kalan</strong> | Serbest Kalma: <strong id="dispReleaseClause">€25M</strong></p>
+                    <p id="dispAgentInfo" style="margin-bottom: 6px; font-size:0.8rem; color:var(--purple);">Menajer: <span id="dispAgentName">Aile Menajeri</span> | 📱 Takipçi: <strong id="dispFollowers" style="color:var(--pink);">5.000</strong></p>
+                    <div>
+                        <span id="premiumBadge" class="badge badge-pink hidden">⭐ PREMIUM VIP</span>
+                        <span id="nationalBadge" class="badge badge-danger hidden">🇹🇷 A MİLLİ TAKIM (OVR 78+)</span>
+                        <span id="nationalCaptainBadge" class="badge badge-gold hidden">👑 MİLLİ KAPTAN</span>
+                        <span id="bosmanBadge" class="badge badge-purple hidden">📜 BOSMAN (Son Sene)</span>
+                        <span id="statusInjuryBadge" class="badge badge-danger hidden">🏥 SAKAT</span>
+                        <span id="statusSuspendedBadge" class="badge badge-danger hidden">🟨 CEZALI</span>
+                    </div>
+                </div>
+                <div class="fut-card">
+                    <div class="number-badge" id="cardKitNum">#10</div>
+                    <div class="ovr" id="dispOvr">65</div>
+                    <div class="pos" id="cardPos">ST</div>
+                    <div class="name" id="cardName">PLAYER</div>
+                </div>
+            </div>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('main')">⚽ Saha</button>
+                <button class="tab-btn" style="background: linear-gradient(135deg, #10b981, #047857); color:#fff;" onclick="switchTab('squad')">👥 Kadro & 11</button>
+                <button class="tab-btn" style="background: linear-gradient(135deg, #ef4444, #b91c1c); color:#fff;" onclick="openNationalModal()">🇹🇷 Milli Takım</button>
+                <button class="tab-btn" onclick="switchTab('contract')">📜 Sözleşme & Bosman</button>
+                <button class="tab-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#000;" onclick="switchTab('leaderboard')">🌍 Global</button>
+                <button class="tab-btn" style="background: linear-gradient(135deg, #ec4899, #be185d); color:#fff;" onclick="switchTab('store')">🛒 Mağaza</button>
+                <button class="tab-btn" onclick="switchTab('agent')">💼 Menajer</button>
+                <button class="tab-btn" onclick="switchTab('chart')">📈 Grafik</button>
+                <button class="tab-btn" onclick="switchTab('skilltree')">🌳 Skill Tree</button>
+                <button class="tab-btn" onclick="switchTab('attributes')">⚡ Yetenek</button>
+                <button class="tab-btn" onclick="switchTab('life')">❤️ Özel Hayat</button>
+                <button class="tab-btn" onclick="switchTab('invest')">📈 Borsa</button>
+                <button class="tab-btn" onclick="switchTab('coach')">👨‍💼 Hoca</button>
+                <button class="tab-btn" onclick="switchTab('table')">📊 Puan / Fikstür</button>
+                <button class="tab-btn" onclick="switchTab('train')">🏋️ İdman</button>
+                <button class="tab-btn" onclick="switchTab('sponsor')">💼 Sponsorluk</button>
+                <button class="tab-btn" onclick="switchTab('garage')">🏎️ Garaj</button>
+                <button class="tab-btn" onclick="switchTab('transfer')">🔄 Transfer</button>
+                <button class="tab-btn" onclick="switchTab('museum')">🎖️ Müze</button>
+            </div>
+
+            <!-- KADRO & İLK 11 SEKMESİ -->
+            <div id="tab-squad" class="hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h3 style="color:var(--gold);" id="dispSquadTeamName">Kulüp - İlk 11 & Takım Kadrosu</h3>
+                        <p>Taktiksel dizilişiniz (4-3-3) ve takım arkadaşların:</p>
+                    </div>
+                    <div class="card" style="padding:8px 14px; margin:0; text-align:center; border-color:var(--gold);">
+                        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:bold;">TAKIM GEN (OVR)</div>
+                        <div style="font-size:1.5rem; font-weight:900; color:var(--gold);" id="dispTeamOvr">75</div>
+                    </div>
+                </div>
+
+                <!-- İLK 11 YEŞİL SAHA PANOLARI -->
+                <div class="tactical-pitch" id="tacticalPitchBox"></div>
+
+                <div class="card" style="padding: 10px; margin-top: 10px;">
+                    <h4 style="color:var(--accent); margin-bottom:8px;">📋 İlk 11 ve Takım Oyuncu Listesi</h4>
+                    <div class="table-responsive">
+                        <table class="leaderboard-table" style="text-align:center;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th style="text-align:left;">Oyuncu Adı</th>
+                                    <th>Mevki</th>
+                                    <th>Yaş</th>
+                                    <th>GEN</th>
+                                    <th>Piyasa Değeri</th>
+                                    <th>Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody id="squadTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GLOBAL SIRALAMA SEKMESİ -->
+            <div id="tab-leaderboard" class="hidden">
+                <h3 style="color:var(--gold);">🌍 Küresel Oyuncu Sıralaması (Leaderboard)</h3>
+                <p>Dünyadaki tüm futbolcular arasındaki sıralaman:</p>
+
+                <div class="grid-2" style="margin-bottom: 10px;">
+                    <button class="btn btn-gold" id="btnSortOvr" onclick="setLeaderboardSort('ovr')">🏆 Overall (GEN) Sıralaması</button>
+                    <button class="btn btn-blue" id="btnSortValue" onclick="setLeaderboardSort('value')">💰 Piyasa Değeri / Para Sıralaması</button>
+                </div>
+
+                <div class="card" style="padding: 8px;">
+                    <div class="table-responsive">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th># Sıra</th>
+                                    <th>Futbolcu</th>
+                                    <th>Kulüp</th>
+                                    <th>GEN</th>
+                                    <th>Piyasa Değeri</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SÖZLEŞME & BOSMAN SEKMESİ -->
+            <div id="tab-contract" class="hidden">
+                <h3 style="color:var(--purple);">📜 Detaylı Sözleşme & Serbest Kalma</h3>
+                <div class="grid-2" style="margin-bottom: 10px;">
+                    <div class="card" style="padding: 12px; border-color: var(--purple);">
+                        <h4>📋 Mevcut Sözleşme Şartları</h4>
+                        <p>Kulüp: <strong id="cModalClub">-</strong></p>
+                        <p>Kalan Süre: <strong id="cModalYears" style="color:var(--gold);">0 Yıl</strong></p>
+                        <p>Haftalık Maaş: <strong id="cModalWage" style="color:var(--accent);">€0</strong></p>
+                        <p>Serbest Kalma Bedeli: <strong id="cModalRelease" style="color:var(--danger);">€0</strong></p>
+                        
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-purple" onclick="renewContractWithClub()">✍️ Kulüple Sözleşme Yenile</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding: 12px; border-color: var(--gold);">
+                        <h4>🆓 Bosman Kuralı & Transfer</h4>
+                        <p style="font-size:0.8rem;">Sözleşmenin son senesinde Bonservissiz sözleşme imzalayıp **İmza Parası (Signing Bonus)** kazanabilirsin!</p>
+                        <div id="bosmanOffersBox" style="margin-top: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAĞAZA SEKMESİ -->
+            <div id="tab-store" class="hidden">
+                <h3 style="color:var(--pink);">🛒 Oyun İçi Mağaza & VIP Üyelikler</h3>
+                <div class="grid-2">
+                    <div class="card" style="border-color: var(--pink);">
+                        <h4 style="color:var(--pink);">⭐ Premium VIP Pass ($1.00)</h4>
+                        <ul style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; padding-left:15px; line-height:1.5;">
+                            <li>✅ Oyunu tamamen **reklamsız** yapar.</li>
+                            <li>✅ **Sınırsız Hızlı Simülasyon** hakkı açar.</li>
+                            <li>✅ Her gün **€250.000 Ödül** hakkı kazandırır.</li>
+                        </ul>
+                        <button class="btn btn-pink" id="btnBuyPremium" onclick="buyPremiumPass()">$1.00 - VIP Abonelik Satın Al</button>
+                    </div>
+
+                    <div class="card" style="border-color: var(--gold);">
+                        <h4 style="color:var(--gold);">⚡ Prime Titan Krampon ($0.49)</h4>
+                        <ul style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; padding-left:15px; line-height:1.5;">
+                            <li>🚀 **+10 Hız (Pace)** Katkısı</li>
+                            <li>🎯 **+10 Şut (Shooting)** Katkısı</li>
+                            <li>🎯 **+10 Pas (Passing)** Katkısı</li>
+                        </ul>
+                        <button class="btn btn-gold" id="btnBuyPrimeBoot" onclick="buyPrimeBoot()">$0.49 - Prime Kramponu Al</button>
+                    </div>
+                </div>
+
+                <div id="dailyRewardBox" class="card hidden" style="border-color: var(--accent); margin-top:8px;">
+                    <h4 style="color:var(--accent);">🎁 Premium Günlük Ödül Paneli</h4>
+                    <button class="btn btn-gold" onclick="claimDailyReward()">💰 Günlük Ödülü Al (€250.000)</button>
+                </div>
+            </div>
+
+            <!-- SEKMELER -->
+            <div id="tab-main">
+                <div class="pitch">
+                    <div class="pitch-line center-line"></div>
+                    <div class="center-circle"></div>
+                    <div id="matchBall" class="ball"></div>
+                    <div id="matchPlayerDot" class="player-dot"></div>
+                </div>
+
+                <!-- SAKATLIK TEDAVİ PANELİ -->
+                <div id="injuryTreatmentBox" class="card hidden" style="border-color: var(--danger); background: rgba(244, 63, 94, 0.1); margin-bottom:10px;">
+                    <h3 style="color:var(--danger); margin-bottom:4px;">🏥 SAKATLIK & İYİLEŞME MERKEZİ</h3>
+                    <p style="color:var(--text); font-size:0.85rem;">Teşhis: <strong id="injuryDiagnosisText" style="color:var(--gold);">-</strong> | Kalan Süre: <strong id="injuryWeeksText" style="color:var(--danger);">0 Hafta</strong></p>
+                    <div class="grid-2" style="margin-top:8px;">
+                        <button class="btn btn-gold" onclick="treatInjury('physio')">👨‍⚕️ Özel Fizyoterapist (€50.000) [-1 Hft]</button>
+                        <button class="btn btn-purple" onclick="treatInjury('camp')">🇨🇭 İsviçre Rehab Kampı (€200.000) [-3 Hft]</button>
+                    </div>
+                </div>
+
+                <!-- MAÇ İÇİ AKSİYON -->
+                <div id="action-zone" class="card hidden" style="border-color: var(--gold); margin-bottom:10px;">
+                    <h3 style="color:var(--gold); margin-bottom: 4px;">⚽ SIRA SENDE! (KRİTİK MAÇ ANI)</h3>
+                    <p id="actionScenarioText" style="color:var(--text); font-weight:bold; font-size:0.85rem; margin-bottom:8px;">Lig Karşılaşması Pozisyonu</p>
+                    <div class="grid-3" id="action-buttons"></div>
+                </div>
+
+                <!-- BASIN TOPLANTISI PANELİ -->
+                <div id="press-zone" class="card hidden" style="border-color: var(--purple); margin-bottom:10px;">
+                    <h3 style="color:var(--purple); margin-bottom: 4px;">🎙️ Maç Sonu Basın Toplantısı</h3>
+                    <p style="font-size:0.8rem; color:var(--text);">Gazeteci: "Harika bir mücadeleydi. Bugünkü performansın hakkında ne düşünüyorsun?"</p>
+                    <div class="grid-3" style="margin-top:8px;">
+                        <button class="btn btn-blue" onclick="handlePressAnswer('humble')">"Takım Arkadaşlarım" (+2 Hoca, +2k Takipçi)</button>
+                        <button class="btn btn-gold" onclick="handlePressAnswer('confident')">"Kalitemi Gösterdim" (+5k Takipçi, +5 Moral)</button>
+                        <button class="btn btn-purple" onclick="handlePressAnswer('aggressive')">"Daha İyisini Hak Ediyoruz" (+15k Takipçi)</button>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 10px;">
+                    <div class="card" style="padding: 10px; margin: 0;">
+                        <h3 style="font-size:0.95rem;">📊 Performans & Kart Durumu</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item"><span>Sezonluk Maç:</span> <strong id="statMatches">0</strong></div>
+                            <div class="stat-item"><span>Kariyer Maç:</span> <strong id="totalCareerMatches" style="color:var(--purple);">0</strong></div>
+                            <div class="stat-item"><span>Sezon Gol/Asist:</span> <strong><span id="statGoals">0</span> / <span id="statAssists">0</span></strong></div>
+                            <div class="stat-item"><span>Kariyer Gol/Asist:</span> <strong style="color:var(--gold);"><span id="totalCareerGoals">0</span> / <span id="totalCareerAssists">0</span></strong></div>
+                            <div class="stat-item"><span>Milli Maç/Gol:</span> <strong style="color:var(--danger);"><span id="natMatches">0</span> / <span id="natGoals">0</span></strong></div>
+                            <div class="stat-item"><span>Son Rating:</span> <strong id="statLastRating" style="color:var(--gold);">0.0</strong></div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 10px; margin: 0;">
+                        <h3 style="font-size:0.95rem;">⚡ Durum & Tecrübe (XP)</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span>Kondisyon:</span> 
+                                <div class="progress-bg"><div id="barCond" class="progress-fill" style="width: 100%;"></div></div>
+                            </div>
+                            <div class="stat-item">
+                                <span>Moral:</span> 
+                                <div class="progress-bg"><div id="barMorale" class="progress-fill progress-fill-gold" style="width: 100%;"></div></div>
+                            </div>
+                            <div class="stat-item"><span>Mevcut XP:</span> <strong id="statXpDisplay" style="color:var(--purple);">0 XP</strong></div>
+                            <div class="stat-item"><span>Piyasa Değeri:</span> <strong id="statValueDisplay" style="color:var(--accent);">€250.000</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log-box" id="logBox">Spiker: Karşılaşma düdüğü bekleniyor...</div>
+
+                <div class="grid-3">
+                    <button class="btn btn-gold" id="btnLiveMatch" onclick="startLiveMatch()">🏆 Canlı Maça Çık (Hafta <span id="statWeek">1</span>)</button>
+                    <button class="btn btn-blue" id="btnSimHalf" onclick="simWeeks(19)">⏩ Yarı Sezon Simüle Et (🔒 VIP)</button>
+                    <button class="btn btn-purple" id="btnSimFull" onclick="simWeeks(38)">⏩ Sezon Sonu Simüle Et (🔒 VIP)</button>
+                </div>
+            </div>
+
+            <!-- MENAJER SEKMESİ -->
+            <div id="tab-agent" class="hidden">
+                <h3>💼 Menajer Temsilciliği Odası</h3>
+                <div id="agent-options-container" class="grid-3" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- GRAFİK SEKMESİ -->
+            <div id="tab-chart" class="hidden">
+                <h3>📈 Overall (OVR) & Piyasa Değeri Zaman Grafiği</h3>
+                <div class="card" style="padding: 10px; margin-bottom: 10px;">
+                    <canvas id="ovrChart" style="max-height: 200px;"></canvas>
+                </div>
+                <div class="card" style="padding: 10px;">
+                    <canvas id="valueChart" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+
+            <!-- SKILL TREE SEKMESİ -->
+            <div id="tab-skilltree" class="hidden">
+                <h3>🌳 Özel Yetenek (Skill Tree) Ağacı</h3>
+                <div class="card" style="padding: 10px; margin-bottom: 10px; border-color: var(--purple);">
+                    <h4 style="color:var(--purple);">Mevcut Tecrübe Puanı: <span id="skillTreeXpText" style="color:var(--gold);">0 XP</span></h4>
+                    <p style="font-size:0.78rem; margin-bottom:0;">Maç performanslarından ve antrenmanlardan puan kazanırsın.</p>
+                </div>
+                <div id="skill-tree-list" class="grid-2"></div>
+            </div>
+
+            <!-- YETENEKLER SEKMESİ -->
+            <div id="tab-attributes" class="hidden">
+                <h3>⚡ Oyuncu Yetenekleri</h3>
+                <div class="stats-grid" style="margin-bottom:10px;">
+                    <div class="stat-item"><span>🚀 Hız (PAC):</span> <strong id="attrPace">65</strong></div>
+                    <div class="stat-item"><span>🎯 Şut (SHO):</span> <strong id="attrShooting">65</strong></div>
+                    <div class="stat-item"><span>🎯 Pas (PAS):</span> <strong id="attrPassing">65</strong></div>
+                    <div class="stat-item"><span>⚽ Çalım (DRI):</span> <strong id="attrDribble">65</strong></div>
+                    <div class="stat-item"><span>🛡️ Defans (DEF):</span> <strong id="attrDefense">60</strong></div>
+                    <div class="stat-item"><span>💪 Fizik (PHY):</span> <strong id="attrPhysical">65</strong></div>
+                    <div class="stat-item"><span>🎯 Teknik (TEC):</span> <strong id="attrTechnique">65</strong></div>
+                </div>
+            </div>
+
+            <!-- ÖZEL HAYAT -->
+            <div id="tab-life" class="hidden">
+                <h3>❤️ Özel Hayat & Aile</h3>
+                <div class="grid-2">
+                    <div class="card" style="margin: 0; padding: 12px; border-color: var(--pink);">
+                        <h4 style="color:var(--pink);">💍 Düğün Yap</h4>
+                        <button class="btn btn-pink" onclick="buyLife('marriage')">Düğün Yap (€1.500.000)</button>
+                    </div>
+                    <div class="card" style="margin: 0; padding: 12px; border-color: var(--blue);">
+                        <h4 style="color:var(--blue);">👶 Çocuk Sahibi Ol</h4>
+                        <button class="btn btn-blue" onclick="buyLife('child')">Çocuk Sahibi Ol (€500.000)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BORSA & İŞLETME -->
+            <div id="tab-invest" class="hidden">
+                <h3>📈 Borsa & İşletmeler</h3>
+                <div class="grid-2" style="margin-bottom:10px;">
+                    <div class="card" style="margin: 0; padding: 12px;">
+                        <h4 style="color:var(--gold);">💰 Altın (XAUUSD)</h4>
+                        <p>Mevcut Yatırımın: <strong id="investGoldVal">€0</strong></p>
+                        <button class="btn btn-gold" onclick="investTrade('gold')">€100.000 Yatır</button>
+                    </div>
+                    <div class="card" style="margin: 0; padding: 12px;">
+                        <h4 style="color:var(--blue);">📊 S&P 500</h4>
+                        <p>Mevcut Yatırımın: <strong id="investSpVal">€0</strong></p>
+                        <button class="btn btn-blue" onclick="investTrade('sp500')">€100.000 Yatır</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOCA SEKMESİ -->
+            <div id="tab-coach" class="hidden">
+                <h3>👨‍💼 Teknik Direktör Odası</h3>
+                <div class="card" style="padding:12px; margin-bottom:10px;">
+                    <p style="margin-bottom:4px;">Hoca Güveni: <strong id="coachTrustText" style="color:var(--gold);">%50</strong></p>
+                    <p id="coachStatusText" style="font-size:0.82rem; font-weight:bold; margin-bottom:6px;">Durum: 🟢 Kadroda (İlk 11)</p>
+                    <p style="font-size:0.82rem; color:var(--text-muted);">Mevcut Haftalık Maaşın: <strong id="dispWeeklyWageText" style="color:var(--accent);">€0 / Hafta</strong></p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card" style="padding:10px; margin:0; border-color:var(--gold);">
+                        <h4>🗣️ Hocayı Öv</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Hocanı överek arandaki güveni +10 artırır.</p>
+                        <button class="btn btn-gold" id="btnPraiseCoach" onclick="coachTalk('praise')">Hocayı Öv (+10 Güven)</button>
+                        <p id="praiseCooldownInfo" style="font-size:0.7rem; color:var(--purple); margin-top:4px; font-weight:bold;"></p>
+                    </div>
+
+                    <div class="card" style="padding:10px; margin:0; border-color:var(--blue);">
+                        <h4>💰 Maaş Zammı Talebi</h4>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">Şart: Son Reyting ≥ 7.5 & Güven ≥ %60.</p>
+                        <button class="btn btn-blue" onclick="coachTalk('raise')">Maaş Zammı İstiyorum (%20 Zam)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LİG TABLOSU & SEZONLUK FİKSTÜR -->
+            <div id="tab-table" class="hidden">
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                    <button class="sub-tab-btn active" id="btnSubTabLeague" onclick="switchTableSubTab('league')">🇹🇷 Lig Tablosu & Fikstür</button>
+                    <button class="sub-tab-btn" id="btnSubTabEuro" onclick="switchTableSubTab('euro')">🇪🇺 Avrupa Kupası</button>
+                </div>
+
+                <!-- ULUSAL LİG GÖRÜNÜMÜ -->
+                <div id="subTabLeagueBox" class="grid-2" style="align-items: start;">
+                    <div class="card" style="padding: 10px; margin: 0;">
+                        <h3 style="color:var(--gold);">📊 Lig Puan Durumu</h3>
+                        <div class="table-responsive" id="leagueTableBox"></div>
+                        
+                        <div class="legend-box">
+                            <div class="legend-item"><div class="legend-color" style="background:#3b82f6;"></div> 1-3: UCL</div>
+                            <div class="legend-item"><div class="legend-color" style="background:#f59e0b;"></div> 4-5: UEL</div>
+                            <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div> 6: UECL</div>
+                            <div class="legend-item"><div class="legend-color" style="background:#f43f5e;"></div> Son 3: Düşme</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="padding: 10px; margin: 0; max-height: 480px; overflow-y: auto;">
+                        <h3 style="color:var(--accent);">📅 <span id="dispTeamFixtureTitle">Takımın Lig Fikstürü</span></h3>
+                        <div id="myTeamSeasonFixtureBox"></div>
+                    </div>
+                </div>
+
+                <!-- AVRUPA KUPASI GÖRÜNÜMÜ -->
+                <div id="subTabEuroBox" class="grid-2 hidden" style="align-items: start;">
+                    <div class="card" style="padding: 10px; margin: 0;">
+                        <h3 style="color:var(--blue);" id="euroTableTitle">🇪🇺 Avrupa Grubu</h3>
+                        <div class="table-responsive" id="euroTableBox"></div>
+                    </div>
+                    
+                    <div class="card" style="padding: 10px; margin: 0; max-height: 480px; overflow-y: auto;">
+                        <h3 style="color:var(--gold);">📅 Avrupa Maç Takvimi</h3>
+                        <div id="euroFixtureBox"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İDMAN -->
+            <div id="tab-train" class="hidden">
+                <h3>🏋️ Antrenman Tesisleri</h3>
+                <p style="margin-bottom: 8px; color: var(--gold);">⚠️ Haftada sadece 1 idman yapabilirsin!</p>
+                <div class="grid-2" style="margin-bottom:12px; gap: 8px;">
+                    <button class="btn" id="btnTrainFit" onclick="train('fit')">⚡ Hız & Kondisyon (+1 Hız/Fizik, +50 XP)</button>
+                    <button class="btn btn-blue" id="btnTrainTech" onclick="train('tech')">🎯 Teknik & Şut (+1 Teknik/Şut, +50 XP)</button>
+                    <button class="btn btn-gold" id="btnTrainTact" onclick="train('tact')">🧠 Taktik & Pas (+1 Pas/Defans, +50 XP)</button>
+                    <button class="btn btn-purple" id="btnTrainDribble" onclick="train('dribble')">⚽ Dripling & Çalım (+1 Çalım, +50 XP)</button>
+                </div>
+            </div>
+
+            <!-- SPONSOR & EKİPMAN -->
+            <div id="tab-sponsor" class="hidden">
+                <h3>💼 Sponsorluk & Ekipman Paneli</h3>
+                <div class="card" style="padding: 12px; margin-bottom: 10px; border-color:var(--gold);">
+                    <h4 style="color:var(--gold);">📩 Sponsor Teklifleri</h4>
+                    <div id="dynamic-sponsors-list"></div>
+                </div>
+
+                <div class="card" style="padding: 12px; margin-bottom: 10px;">
+                    <h4>👟 Krampon Koleksiyonu</h4>
+                    <div id="boots-list"></div>
+                </div>
+            </div>
+
+            <!-- GARAJ -->
+            <div id="tab-garage" class="hidden">
+                <h3>🏎️ Garaj & Lüks Yaşam</h3>
+                <div id="lifestyle-list"></div>
+            </div>
+
+            <!-- TRANSFER -->
+            <div id="tab-transfer" class="hidden">
+                <h3>🔄 Gelen Transfer Teklifleri</h3>
+                <div id="transfer-list"></div>
+            </div>
+
+            <!-- MÜZE SEKMESİ -->
+            <div id="tab-museum" class="hidden">
+                <h3>🎖️ Kupa Müzesi & Başarılar</h3>
+                <div class="stats-grid">
+                    <div class="stat-item"><span>Ballon d'Or:</span> <strong id="trophyBallon" style="color:var(--gold);">0</strong></div>
+                    <div class="stat-item"><span>Dünya Kupası / EURO:</span> <strong id="trophyNational" style="color:var(--danger);">0</strong></div>
+                    <div class="stat-item"><span>Gol Krallığı:</span> <strong id="trophyBoot" style="color:var(--accent);">0</strong></div>
+                    <div class="stat-item"><span>Lig Şampiyonlukları:</span> <strong id="trophyLeague" style="color:var(--blue);">0</strong></div>
+                    <div class="stat-item"><span>Avrupa Kupaları:</span> <strong id="trophyEuro" style="color:var(--purple);">0</strong></div>
+                    <div class="stat-item"><span>Asist Krallığı:</span> <strong id="trophyAssist" style="color:var(--pink);">0</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClickSound() {
+            try {
+                if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch(e){}
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button') || e.target.closest('.tab-btn') || e.target.closest('.sub-tab-btn')) {
+                playClickSound();
+            }
+        });
+
+        const clubRatings = {
+            "İstanbul Aslanları": 78, "İstanbul Kanaryaları": 78, "Boğaz Kartalları": 76, "Karadeniz Fırtınası": 75,
+            "İstanbul Turuncuları": 73, "Gaziantep FK": 70, "Ankara Gücü": 70, "Sivas Yiğidolar": 71, "Antalya Kırmızı": 71,
+            "Alanya Turuncu": 71, "Kocaeli Yeşil": 70, "Bursa Timsahlar": 69, "Konya Anadolu": 71, "Kayseri İç Anadolu": 70,
+            "Hatay Güney": 70, "Kasımpaşa Semt": 72, "Rize Çaycılar": 71, "Samsun Kırmızı": 72, "Adana Şimşekler": 71,
+
+            "Man Blue": 86, "North London Red": 84, "Merseyside Red": 84, "West London Blue": 81,
+            "Man Red": 81, "North London White": 81, "Aston Midlands": 80, "Newcastle Magpies": 80,
+            "Brighton Seagulls": 78, "West Ham Hammers": 77, "Wolverhampton Wolves": 76, "Crystal Eagle": 76,
+            "Everton Blue": 76, "Bournemouth Cherries": 76, "Nottingham Forest": 76, "Brentford Bees": 76,
+            "Fulham Cottagers": 76, "Leicester Foxes": 75, "Ipswich Blue": 73, "Southampton Saints": 73,
+
+            "Madrid Blanco": 86, "Catalonia Red-Blue": 84, "Madrid Red-White": 82, "Sevilla Red": 77,
+            "Basque Red-White": 79, "Villarreal Yellow": 78, "Real Sociedad Blue": 79, "Betis Green": 78,
+            "Valencia Bats": 76, "Getafe Blue": 75, "Girona Red": 78, "Celta Sky Blue": 76,
+            "Osasuna Red": 75, "Rayo Lightning": 75, "Mallorca Vermilions": 75, "Las Palmas Yellow": 74,
+            "Alaves Blue": 74, "Leganes Green": 73, "Valladolid Violet": 73, "Espanyol Parakeets": 74,
+
+            "Lombardia Black-Blue": 83, "Milano Red-Black": 81, "Torino Black-White": 81, "Partenopei Sky-Blue": 81,
+            "Roma Capitals": 80, "Lazio Eagles": 79, "Atalanta Goddess": 80, "Fiorentina Violets": 78,
+            "Torino Maroons": 76, "Bologna Red-Blue": 77, "Udinese Black-White": 75, "Sassuolo Green-Black": 74,
+            "Genoa Griffins": 75, "Verona Yellow-Blue": 74, "Empoli Blue": 73, "Lecce Yellow-Red": 73,
+            "Cagliari Reds": 73, "Monza Red": 74, "Parma Yellow-Blue": 74, "Como Lake": 75,
+
+            "Bavaria Red": 85, "Bayer Black-Red": 82, "Dortmund Black-Yellow": 81, "Leipzig Red-Bulls": 80,
+            "Frankfurt Eagles": 78, "Stuttgart White-Red": 78, "Wolfsburg Green": 76, "Gladbach Foals": 76,
+            "Bremen Green-White": 75, "Freiburg Black-White": 76, "Augsburg Red-Green": 74, "Mainz Red-White": 75,
+            "Union Berlin": 75, "Hoffenheim Blue": 76, "Heidenheim Red": 74, "St. Pauli Skull": 73,
+            "Bochum Blue": 73, "Holstein Blue": 72,
+
+            "Paris Capital": 84, "Monaco Princes": 79, "Marseille Olympians": 79, "Lyon Lions": 78,
+            "Lille Mastiffs": 78, "Rennes Red-Black": 77, "Nice Gym": 77, "Lens Blood-Gold": 76,
+            "Reims Red": 74, "Strasbourg Racing": 75, "Toulouse Violets": 74, "Montpellier Orange": 74,
+            "Nantes Canaries": 74, "Brest Armorique": 76, "Auxerre White": 72, "Saint-Etienne Greens": 73,
+            "Angers Black-White": 72, "Le Havre Sky-Blue": 72
+        };
+
+        const leagueClubs = {
+            "Türkiye Süper Ligi": [
+                "İstanbul Aslanları", "İstanbul Kanaryaları", "Boğaz Kartalları", "Karadeniz Fırtınası", 
+                "İstanbul Turuncuları", "Gaziantep FK", "Ankara Gücü", "Sivas Yiğidolar", "Antalya Kırmızı",
+                "Alanya Turuncu", "Kocaeli Yeşil", "Bursa Timsahlar", "Konya Anadolu", "Kayseri İç Anadolu",
+                "Hatay Güney", "Kasımpaşa Semt", "Rize Çaycılar", "Samsun Kırmızı", "Adana Şimşekler"
+            ],
+            "İngiltere 1. Ligi": [
+                "Man Blue", "North London Red", "Merseyside Red", "West London Blue", 
+                "Man Red", "North London White", "Aston Midlands", "Newcastle Magpies", 
+                "Brighton Seagulls", "West Ham Hammers", "Wolverhampton Wolves", "Crystal Eagle",
+                "Everton Blue", "Bournemouth Cherries", "Nottingham Forest", "Brentford Bees",
+                "Fulham Cottagers", "Leicester Foxes", "Ipswich Blue", "Southampton Saints"
+            ],
+            "İspanya Ligi": [
+                "Madrid Blanco", "Catalonia Red-Blue", "Madrid Red-White", "Sevilla Red", 
+                "Basque Red-White", "Villarreal Yellow", "Real Sociedad Blue", "Betis Green",
+                "Valencia Bats", "Getafe Blue", "Girona Red", "Celta Sky Blue",
+                "Osasuna Red", "Rayo Lightning", "Mallorca Vermilions", "Las Palmas Yellow",
+                "Alaves Blue", "Leganes Green", "Valladolid Violet", "Espanyol Parakeets"
+            ],
+            "İtalya Ligi": [
+                "Lombardia Black-Blue", "Milano Red-Black", "Torino Black-White", "Partenopei Sky-Blue", 
+                "Roma Capitals", "Lazio Eagles", "Atalanta Goddess", "Fiorentina Violets",
+                "Torino Maroons", "Bologna Red-Blue", "Udinese Black-White", "Sassuolo Green-Black",
+                "Genoa Griffins", "Verona Yellow-Blue", "Empoli Blue", "Lecce Yellow-Red",
+                "Cagliari Reds", "Monza Red", "Parma Yellow-Blue", "Como Lake"
+            ],
+            "Almanya Ligi": [
+                "Bavaria Red", "Bayer Black-Red", "Dortmund Black-Yellow", "Leipzig Red-Bulls", 
+                "Frankfurt Eagles", "Stuttgart White-Red", "Wolfsburg Green", "Gladbach Foals",
+                "Bremen Green-White", "Freiburg Black-White", "Augsburg Red-Green", "Mainz Red-White",
+                "Union Berlin", "Hoffenheim Blue", "Heidenheim Red", "St. Pauli Skull",
+                "Bochum Blue", "Holstein Blue"
+            ],
+            "Fransa Ligi": [
+                "Paris Capital", "Monaco Princes", "Marseille Olympians", "Lyon Lions", 
+                "Lille Mastiffs", "Rennes Red-Black", "Nice Gym", "Lens Blood-Gold",
+                "Reims Red", "Strasbourg Racing", "Toulouse Violets", "Montpellier Orange",
+                "Nantes Canaries", "Brest Armorique", "Auxerre White", "Saint-Etienne Greens",
+                "Angers Black-White", "Le Havre Sky-Blue"
+            ]
+        };
+
+        const europeanGiants = [
+            "Madrid Blanco", "Bavaria Red", "Man Blue", "Catalonia Red-Blue", 
+            "Paris Capital", "Lombardia Black-Blue", "Merseyside Red", "Dortmund Black-Yellow"
+        ];
+
+        const globalPlayers = [
+            { name: "C. Aranda", club: "Madrid Blanco", ovr: 91, value: 180000000 },
+            { name: "E. Lindqvist", club: "Man Blue", ovr: 91, value: 180000000 },
+            { name: "J. Sterling", club: "Madrid Blanco", ovr: 90, value: 150000000 },
+            { name: "V. Santos", club: "Madrid Blanco", ovr: 90, value: 150000000 },
+            { name: "H. Fischer", club: "Bavaria Red", ovr: 89, value: 110000000 },
+            { name: "K. Vance", club: "Man Blue", ovr: 89, value: 90000000 },
+            { name: "M. Rossi", club: "Merseyside Red", ovr: 88, value: 80000000 },
+            { name: "V. Okafor", club: "İstanbul Aslanları", ovr: 87, value: 75000000 },
+            { name: "L. Thorne", club: "Catalonia Red-Blue", ovr: 85, value: 120000000 },
+            { name: "A. Demir", club: "Madrid Blanco", ovr: 81, value: 45000000 },
+            { name: "K. Şahin", club: "Lisbon Eagles", ovr: 79, value: 22000000 },
+            { name: "S. Kaya", club: "Boğaz Kartalları", ovr: 75, value: 15000000 }
+        ];
+
+        const lifestyleItems = [
+            { name: "Lüks Spor Araba 🏎️", price: 150000 },
+            { name: "Havuzlu Villa 🏰", price: 750000 },
+            { name: "Özel Jet 🛩️", price: 3000000 }
+        ];
+
+        const bootsList = [
+            { name: "Standart Siyah Krampon", reqOvr: 60, price: 0, bonus: "Bonus Yok", pace: 0, sho: 0, pas: 0 },
+            { name: "Puma Future Z", reqOvr: 70, price: 15000, bonus: "+2 Hız", pace: 2, sho: 0, pas: 0 },
+            { name: "Adidas Predator", reqOvr: 75, price: 35000, bonus: "+2 Şut", pace: 0, sho: 2, pas: 0 },
+            { name: "Nike Mercurial Vapor", reqOvr: 82, price: 85000, bonus: "+3 Hız & Şut", pace: 3, sho: 3, pas: 0 },
+            { name: "Prime Titan Krampon ⚡ ($0.49)", reqOvr: 10, price: 0, bonus: "+10 Hız, +10 Şut, +10 Pas", pace: 10, sho: 10, pas: 10, isStoreItem: true }
+        ];
+
+        const agentTypesList = [
+            { name: "Aile Menajeri", desc: "Komisyon almaz, sadıktır.", fee: 0 },
+            { name: "Agresif Mino", desc: "Maaş tekliflerini yükseltir.", fee: 50000 },
+            { name: "Prestijli Jorge", desc: "Dev kulüplere kapı açar.", fee: 100000 }
+        ];
+
+        const skillTreeSkills = [
+            { id: "freekick", category: "⚽ Hücum Yetenekleri", name: "🎯 Frikik Ustası", cost: 450, attr: "shooting", boost: 3, desc: "Frikik kaliteni artırır (+3 Şut)." },
+            { id: "longshot", category: "⚽ Hücum Yetenekleri", name: "🚀 Uzaktan Füze", cost: 600, attr: "shooting", boost: 4, desc: "Ceza sahası dışı şutlar (+4 Şut)." },
+            { id: "acrobatic", category: "⚽ Hücum Yetenekleri", name: "🤸 Akrobatik Bitirici", cost: 750, attr: "shooting", boost: 5, desc: "Vole ve rövaşata gol oranı (+5 Şut)." },
+            { id: "sprint_master", category: "⚡ Fizik & Hız", name: "🏎️ Patlayıcı İvmelenme", cost: 500, attr: "pace", boost: 3, desc: "Aniden hızlanma kabiliyeti (+3 Hız)." },
+            { id: "balance", category: "⚡ Fizik & Hız", name: "🛡️ Sarsılmaz Denge", cost: 550, attr: "physical", boost: 4, desc: "İkili mücadele dengesi (+4 Fizik)." },
+            { id: "stamina_boost", category: "⚡ Fizik & Hız", name: "🫁 Demir Akciğer", cost: 650, attr: "physical", boost: 5, desc: "Yorulma oranını azaltır (+5 Fizik)." },
+            { id: "dribble_king", category: "🔮 Teknik & Dripling", name: "🪄 Bilek Hareketi Ustası", cost: 500, attr: "dribble", boost: 3, desc: "Birebirde rakip eksiltme (+3 Çalım)." },
+            { id: "technique_god", category: "🔮 Teknik & Dripling", name: "🎨 Maestro Dokunuşu", cost: 700, attr: "technique", boost: 4, desc: "İlk dokunuş & dar alan kontrolü (+4 Teknik)." },
+            { id: "vision_pass", category: "🧠 Pas & Vizyon", name: "👁️ İğne Deliği Pası", cost: 450, attr: "passing", boost: 3, desc: "Defans arkasına kilit pas (+3 Pas)." },
+            { id: "cross_master", category: "🧠 Pas & Vizyon", name: "🎯 Adrese Teslim Orta", cost: 600, attr: "passing", boost: 4, desc: "Kanatlardan kavisli orta (+4 Pas)." }
+        ];
+
+        let leaderboardSortMode = 'ovr';
+
+        let p = {
+            name: "", age: 17, kitNumber: 10, equippedBoots: "Standart Siyah Krampon", startYear: 2026, pos: "", league: "", club: "", ovr: 65,
+            pace: 65, shooting: 65, passing: 65, dribble: 65, defense: 60, physical: 65, technique: 65,
+            xp: 0, unlockedSkills: [],
+            historyWeeks: [1], historyOvr: [65], historyValue: [250000],
+            matches: 0, goals: 0, assists: 0,
+            careerMatches: 0, careerGoals: 0, careerAssists: 0,
+            natMatches: 0, natGoals: 0, nationalCoachTrust: 50, isNationalCaptain: false,
+            contractYears: 3, releaseClause: 25000000, renewedThisSeason: false,
+            yellowCards: 0, redCards: 0, yellowCardsThisSeason: 0,
+            injuryWeeks: 0, injuryType: null, isSuspended: false, followers: 5000,
+            lastRating: 6.5, value: 250000, cond: 100, morale: 100, money: 15000,
+            weeklyWage: 5000, coachTrust: 50, lastPraiseWeek: -6,
+            activeSponsor: null, sponsorOffers: [],
+            week: 1, trainedThisWeek: false, offers: [], assets: [], agent: "Aile Menajeri",
+            isPremium: false, ownedStoreItems: [],
+            investGold: 0, investSp: 0,
+            trophies: { ballon: 0, national: 0, boot: 0, league: 0, euro: 0, topScorer: 0, assistLeader: 0 }, 
+            leagueTable: [], fullSeasonSchedule: [], euroQualification: 'ucl', euroTable: [], euroSchedule: [], nationalTournament: null,
+            teamSquad: []
+        };
+
+        let ovrChartInstance = null;
+        let valueChartInstance = null;
+
+        const trNamesList = ["Ahmet", "Mehmet", "Oğuz", "Can", "Kaan", "Burak", "Emre", "Onur", "Sarp", "Taha", "Mert", "Ege", "Kutay", "Yiğit", "Bora", "Barış", "Deniz", "Volkan", "Umut", "Arda"];
+        const trSurnamesList = ["Yılmaz", "Kaya", "Demir", "Şahin", "Çelik", "Yıldız", "Yıldırım", "Öztürk", "Aydın", "Özdemir", "Arslan", "Doğan", "Kılıç", "Aslan", "Çetin", "Kara", "Koç", "Kurt", "Özkan", "Şimşek"];
+
+        const foreignNamesList = ["Lucas", "Mateo", "Carlos", "Marco", "Julian", "Gabriel", "David", "Antoine", "Bruno", "Federico", "Stefan", "Hugo", "Leo", "Diego", "Arthur", "Milan", "Sven", "Alex", "Victor", "Robin", "Fabian"];
+        const foreignSurnamesList = ["Silva", "Garcia", "Santos", "Fernandez", "Rodriguez", "Lopez", "Martinez", "Müller", "Dubois", "Jansen", "Nielsen", "Rossi", "Costa", "Oliveira", "Hernandez", "Gomez", "Weber", "Larsen"];
+
+        function updateClubOptions() {
+            const league = document.getElementById('leagueSelect').value;
+            const clubSelect = document.getElementById('clubSelect');
+            clubSelect.innerHTML = "";
+            if (leagueClubs[league]) {
+                leagueClubs[league].forEach(c => { clubSelect.innerHTML += `<option value="${c}">${c}</option>`; });
+            }
+        }
+
+        function initLeagueTable() { 
+            p.leagueTable = leagueClubs[p.league].map(c => ({ 
+                club: c, om: 0, g: 0, b: 0, m: 0, ag: 0, yg: 0, av: 0, pts: 0 
+            })); 
+            generateFullSeasonSchedule();
+            setupEuropeanCupGroup();
+        }
+
+        function generateFullSeasonSchedule() {
+            let teams = [...leagueClubs[p.league]];
+            if (teams.length % 2 !== 0) teams.push("BAY");
+            let halfRounds = teams.length - 1;
+            p.fullSeasonSchedule = [];
+            let teamIndices = teams.map((_, i) => i);
+
+            for (let round = 0; round < halfRounds; round++) {
+                let roundMatches = [];
+                for (let i = 0; i < teams.length / 2; i++) {
+                    let home = teams[teamIndices[i]];
+                    let away = teams[teamIndices[teams.length - 1 - i]];
+                    if (home !== "BAY" && away !== "BAY") {
+                        roundMatches.push({ home, away, homeGoals: null, awayGoals: null, played: false });
+                    }
+                }
+                p.fullSeasonSchedule.push({ week: round + 1, matches: roundMatches });
+                teamIndices.splice(1, 0, teamIndices.pop());
+            }
+
+            for (let round = 0; round < halfRounds; round++) {
+                let roundMatches = p.fullSeasonSchedule[round].matches.map(m => ({
+                    home: m.away, away: m.home, homeGoals: null, awayGoals: null, played: false
+                }));
+                p.fullSeasonSchedule.push({ week: halfRounds + round + 1, matches: roundMatches });
+            }
+        }
+
+        function setupEuropeanCupGroup() {
+            if (!p.euroQualification) {
+                p.euroTable = [];
+                p.euroSchedule = [];
+                return;
+            }
+            let euroTeams = [p.club];
+            let pool = europeanGiants.filter(g => g !== p.club);
+            pool.sort(() => Math.random() - 0.5);
+            euroTeams.push(pool[0], pool[1], pool[2]);
+
+            p.euroTable = euroTeams.map(t => ({
+                club: t, om: 0, g: 0, b: 0, m: 0, ag: 0, yg: 0, av: 0, pts: 0
+            }));
+
+            p.euroSchedule = [
+                { week: 5, home: euroTeams[0], away: euroTeams[1], played: false, homeGoals: null, awayGoals: null },
+                { week: 10, home: euroTeams[2], away: euroTeams[0], played: false, homeGoals: null, awayGoals: null },
+                { week: 15, home: euroTeams[0], away: euroTeams[3], played: false, homeGoals: null, awayGoals: null },
+                { week: 20, home: euroTeams[1], away: euroTeams[0], played: false, homeGoals: null, awayGoals: null },
+                { week: 25, home: euroTeams[0], away: euroTeams[2], played: false, homeGoals: null, awayGoals: null },
+                { week: 30, home: euroTeams[3], away: euroTeams[0], played: false, homeGoals: null, awayGoals: null }
+            ];
+        }
+
+        function formatMoney(num) { return `€${Math.floor(num).toLocaleString('tr-TR')}`; }
+
+        function startGame() {
+            p.name = document.getElementById('playerName').value || "Aziz Şengezer";
+            p.kitNumber = parseInt(document.getElementById('playerKitNumber').value) || 10;
+            p.age = parseInt(document.getElementById('playerAge').value);
+            p.pos = document.getElementById('playerPos').value;
+            p.league = document.getElementById('leagueSelect').value;
+            p.club = document.getElementById('clubSelect').value;
+            p.agent = document.getElementById('agentSelect').value;
+            p.contractYears = parseInt(document.getElementById('initialContractYears').value);
+
+            p.coachTrust = 50;
+            p.nationalCoachTrust = 50;
+            p.isNationalCaptain = false;
+            p.weeklyWage = Math.floor(p.ovr * 200);
+            p.lastPraiseWeek = -6;
+            p.euroQualification = 'ucl';
+            p.followers = 5000;
+            p.injuryWeeks = 0;
+            p.injuryType = null;
+            p.isSuspended = false;
+            p.yellowCardsThisSeason = 0;
+            p.renewedThisSeason = false;
+
+            calculateOvr();
+            calculateRealValue();
+            initLeagueTable();
+            checkDynamicSponsors();
+            generateSquadForClub(p.club);
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            updateUI(); log(`Kariyer Başladı! Kulüp: ${p.club}`); saveGame();
+        }
+
+        function generateSquadForClub(clubName) {
+            const isTurkish = p.league === "Türkiye Süper Ligi";
+            const posList = [
+                { pos: 'GK', pitchX: 50, pitchY: 88 },
+                { pos: 'LB', pitchX: 15, pitchY: 72 },
+                { pos: 'CB', pitchX: 38, pitchY: 76 },
+                { pos: 'CB', pitchX: 62, pitchY: 76 },
+                { pos: 'RB', pitchX: 85, pitchY: 72 },
+                { pos: 'CM', pitchX: 32, pitchY: 53 },
+                { pos: 'CM', pitchX: 68, pitchY: 53 },
+                { pos: 'CAM', pitchX: 50, pitchY: 38 },
+                { pos: 'LW', pitchX: 20, pitchY: 20 },
+                { pos: 'ST', pitchX: 50, pitchY: 13 },
+                { pos: 'RW', pitchX: 80, pitchY: 20 }
+            ];
+
+            let userPosSlotIndex = 9;
+            if (p.pos === 'ST') userPosSlotIndex = 9;
+            else if (p.pos === 'CAM') userPosSlotIndex = 7;
+            else if (p.pos === 'RW') userPosSlotIndex = 10;
+            else if (p.pos === 'LW') userPosSlotIndex = 8;
+            else if (p.pos === 'CM') userPosSlotIndex = 5;
+            else if (p.pos === 'CB') userPosSlotIndex = 2;
+
+            let baseOvr = clubRatings[clubName] || 75;
+            let squad = [];
+
+            posList.forEach((slot, idx) => {
+                if (idx === userPosSlotIndex) {
+                    squad.push({
+                        isUser: true,
+                        name: p.name,
+                        pos: p.pos,
+                        ovr: p.ovr,
+                        pitchX: slot.pitchX,
+                        pitchY: slot.pitchY,
+                        number: p.kitNumber
+                    });
+                } else {
+                    let fn = isTurkish ? trNamesList[Math.floor(Math.random() * trNamesList.length)] : foreignNamesList[Math.floor(Math.random() * foreignNamesList.length)];
+                    let sn = isTurkish ? trSurnamesList[Math.floor(Math.random() * trSurnamesList.length)] : foreignSurnamesList[Math.floor(Math.random() * foreignSurnamesList.length)];
+                    let playerOvr = Math.floor(baseOvr + (Math.random() * 6) - 3);
+                    playerOvr = Math.min(95, Math.max(55, playerOvr));
+                    let num = Math.floor(Math.random() * 88) + 2;
+                    if (num === p.kitNumber) num = num + 1;
+
+                    squad.push({
+                        isUser: false,
+                        name: `${fn.charAt(0)}. ${sn}`,
+                        fullName: `${fn} ${sn}`,
+                        pos: slot.pos,
+                        ovr: playerOvr,
+                        pitchX: slot.pitchX,
+                        pitchY: slot.pitchY,
+                        number: num,
+                        age: Math.floor(Math.random() * 12) + 20,
+                        val: Math.floor(Math.pow(playerOvr / 99, 4) * 80000000)
+                    });
+                }
+            });
+
+            p.teamSquad = squad;
+        }
+
+        function renderSquadUI() {
+            if (!p.teamSquad || p.teamSquad.length === 0) {
+                generateSquadForClub(p.club);
+            }
+
+            let userSlot = p.teamSquad.find(s => s.isUser);
+            if (userSlot) {
+                userSlot.name = p.name;
+                userSlot.pos = p.pos;
+                userSlot.ovr = p.ovr;
+                userSlot.number = p.kitNumber;
+            } else {
+                generateSquadForClub(p.club);
+            }
+
+            const pitchBx = document.getElementById('tacticalPitchBox');
+            const tableBx = document.getElementById('squadTableBody');
+            const teamOvrEl = document.getElementById('dispTeamOvr');
+            const teamNameEl = document.getElementById('dispSquadTeamName');
+
+            if (teamNameEl) teamNameEl.innerText = `${p.club} - İlk 11 & Takım Kadrosu`;
+
+            let totalOvr = p.teamSquad.reduce((sum, item) => sum + item.ovr, 0);
+            let avgOvr = Math.round(totalOvr / p.teamSquad.length);
+            if (teamOvrEl) teamOvrEl.innerText = `${avgOvr}`;
+
+            if (pitchBx) {
+                let pitchHtml = `
+                    <div class="field-line tactical-center-line"></div>
+                    <div class="tactical-center-circle"></div>
+                    <div class="penalty-area-top"></div>
+                    <div class="penalty-area-bottom"></div>
+                `;
+
+                p.teamSquad.forEach(player => {
+                    let isUser = player.isUser;
+                    let displayName = isUser ? p.name.split(' ').pop() : player.name;
+                    let cardClass = isUser ? 'tactical-player-card is-user' : 'tactical-player-card';
+
+                    pitchHtml += `
+                        <div class="${cardClass}" style="left: ${player.pitchX}%; top: ${player.pitchY}%;">
+                            <div class="t-ovr">${player.ovr}</div>
+                            <div class="t-pos">${player.pos}</div>
+                            <div class="t-name">#${player.number} ${displayName}</div>
+                        </div>
+                    `;
+                });
+
+                pitchBx.innerHTML = pitchHtml;
+            }
+
+            if (tableBx) {
+                let tableHtml = "";
+                p.teamSquad.forEach((player) => {
+                    let isUser = player.isUser;
+                    let rowClass = isUser ? 'class="user-row"' : '';
+                    let valText = isUser ? formatMoney(p.value) : formatMoney(player.val || 10000000);
+                    let ageText = isUser ? `${p.age}` : `${player.age || 24}`;
+                    let fullName = isUser ? `${p.name} (Sen)` : (player.fullName || player.name);
+
+                    tableHtml += `
+                        <tr ${rowClass}>
+                            <td><strong style="color:var(--gold);">#${player.number}</strong></td>
+                            <td style="text-align:left;">
+                                ${fullName}
+                                ${isUser ? '<span class="badge" style="margin-left:4px;">SEN</span>' : ''}
+                            </td>
+                            <td><span class="badge badge-purple">${player.pos}</span></td>
+                            <td>${ageText}</td>
+                            <td><strong style="color:var(--accent);">${player.ovr}</strong></td>
+                            <td>${valText}</td>
+                            <td><span style="color:var(--accent); font-weight:bold;">🟢 İlk 11</span></td>
+                        </tr>
+                    `;
+                });
+                tableBx.innerHTML = tableHtml;
+            }
+        }
+
+        function calculateOvr() {
+            let bootBonusPace = 0, bootBonusSho = 0, bootBonusPas = 0;
+            let currentBoot = bootsList.find(b => b.name === p.equippedBoots);
+            if (currentBoot) {
+                bootBonusPace = currentBoot.pace || 0;
+                bootBonusSho = currentBoot.sho || 0;
+                bootBonusPas = currentBoot.pas || 0;
+            }
+
+            let effectivePace = p.pace + bootBonusPace;
+            let effectiveSho = p.shooting + bootBonusSho;
+            let effectivePas = p.passing + bootBonusPas;
+
+            p.ovr = Math.floor((effectivePace + effectiveSho + effectivePas + p.dribble + p.defense + p.physical + (p.technique || 65))/7);
+        }
+
+        function calculateRealValue() {
+            let baseValue = Math.pow(p.ovr / 99, 5) * 180000000; 
+            let ageMultiplier = 1.0;
+            if (p.age <= 20) ageMultiplier = 1.35;
+            else if (p.age <= 24) ageMultiplier = 1.2;
+            else if (p.age <= 28) ageMultiplier = 1.0;
+            else if (p.age <= 32) ageMultiplier = 0.75;
+            else ageMultiplier = 0.4;
+
+            let leagueMultiplier = 1.0;
+            if (p.league === "İngiltere 1. Ligi") leagueMultiplier = 1.4;
+            else if (p.league === "İspanya Ligi") leagueMultiplier = 1.25;
+            else if (p.league === "İtalya Ligi" || p.league === "Almanya Ligi") leagueMultiplier = 1.1;
+            else if (p.league === "Fransa Ligi") leagueMultiplier = 1.0;
+            else if (p.league === "Türkiye Süper Ligi") leagueMultiplier = 0.85;
+
+            let followerBonus = Math.floor(p.followers / 5000) * 10000;
+            p.value = Math.max(100000, Math.floor(baseValue * ageMultiplier * leagueMultiplier) + followerBonus);
+            p.releaseClause = Math.floor(p.value * 1.8);
+        }
+
+        function checkSeasonEnd() {
+            if (p.week > 38) {
+                sortLeagueTable();
+                p.contractYears = Math.max(0, p.contractYears - 1);
+                p.renewedThisSeason = false;
+
+                if (p.teamSquad && p.teamSquad.length > 0) {
+                    let baseClubOvr = clubRatings[p.club] || 75;
+                    let isTurkish = p.league === "Türkiye Süper Ligi";
+
+                    p.teamSquad.forEach((teammate) => {
+                        if (teammate.isUser) return;
+
+                        teammate.age++;
+
+                        if (teammate.age <= 25) {
+                            teammate.ovr = Math.min(95, teammate.ovr + Math.floor(Math.random() * 2) + 1);
+                        } else if (teammate.age >= 31) {
+                            teammate.ovr = Math.max(50, teammate.ovr - Math.floor(Math.random() * 2) - 1);
+                        }
+
+                        teammate.val = Math.floor(Math.pow(teammate.ovr / 99, 4) * 80000000);
+
+                        if (teammate.age > 35) {
+                            let oldName = teammate.fullName;
+                            let fn = isTurkish ? trNamesList[Math.floor(Math.random() * trNamesList.length)] : foreignNamesList[Math.floor(Math.random() * foreignNamesList.length)];
+                            let sn = isTurkish ? trSurnamesList[Math.floor(Math.random() * trSurnamesList.length)] : foreignSurnamesList[Math.floor(Math.random() * foreignSurnamesList.length)];
+                            let newOvr = Math.floor(baseClubOvr + (Math.random() * 6) - 4);
+                            newOvr = Math.min(88, Math.max(58, newOvr));
+                            let num = Math.floor(Math.random() * 88) + 2;
+
+                            teammate.name = `${fn.charAt(0)}. ${sn}`;
+                            teammate.fullName = `${fn} ${sn}`;
+                            teammate.age = Math.floor(Math.random() * 4) + 18;
+                            teammate.ovr = newOvr;
+                            teammate.number = num;
+                            teammate.val = Math.floor(Math.pow(newOvr / 99, 4) * 80000000);
+
+                            log(`👴 Takım arkadaşın ${oldName} (35+) emekli oldu! Yerine genç yetenek (${teammate.fullName}) katıldı.`);
+                        }
+                    });
+                }
+
+                let myRank = p.leagueTable.findIndex(t => t.club === p.club) + 1;
+                if (myRank === 1) {
+                    p.trophies.league++; p.euroQualification = 'ucl';
+                    log("🏆 ŞAMPİYON! Takımın ligi 1. sırada bitirdi!");
+                } else if (myRank <= 3) {
+                    p.euroQualification = 'ucl';
+                    log("🇪🇺 Takımın Devler Kupası bileti aldı!");
+                } else if (myRank <= 5) {
+                    p.euroQualification = 'uel';
+                    log("🇪🇺 Takımın Avrupa Ligi'ne katılıyor.");
+                } else if (myRank === 6) {
+                    p.euroQualification = 'uecl';
+                    log("🇪🇺 Takımın Konferans Ligi bileti kazandı.");
+                } else {
+                    p.euroQualification = null;
+                    log("⚠️ Takımın bu sezon Avrupa kupalarına katılamadı.");
+                }
+
+                if (p.goals >= 20) {
+                    p.trophies.topScorer = (p.trophies.topScorer || 0) + 1;
+                    p.money += 1000000;
+                    log("🥇 TEBRİKLER! GOL KRALI oldun! (+€1.000.000 Prim)");
+                }
+                if (p.assists >= 12) {
+                    p.trophies.assistLeader = (p.trophies.assistLeader || 0) + 1;
+                    p.money += 500000;
+                    log("🅰️ TEBRİKLER! ASİST KRALI oldun! (+€500.000 Prim)");
+                }
+
+                let ballonScore = (p.ovr * 2) + (p.goals * 3) + (p.assists * 2) + (p.trophies.league * 10);
+                let wonBallon = ballonScore >= 250 || (p.goals >= 25 && p.ovr >= 82);
+                if (wonBallon) p.trophies.ballon++;
+                triggerBallonGalaModal(wonBallon);
+
+                let currentYear = p.startYear + Math.floor(p.week / 38);
+                if (p.ovr >= 78 && currentYear % 2 === 0) {
+                    let isWorldCup = currentYear % 4 === 0;
+                    p.nationalTournament = {
+                        title: isWorldCup ? "🏆 DÜNYA KUPASI 2028" : "🇪🇺 EURO TURNUVASI",
+                        stage: "Çeyrek Final",
+                        opponents: ["Fransa", "İspanya", "Almanya", "İngiltere"],
+                        currentMatch: 0
+                    };
+                }
+
+                p.age++;
+                p.matches = 0; p.goals = 0; p.assists = 0; p.yellowCardsThisSeason = 0; p.week = 1;
+                initLeagueTable();
+                log(`🎉 YENİ SEZONA GEÇİLDİ! Yaşın: ${p.age}. Fikstür yenilendi.`);
+            }
+        }
+
+        function triggerBallonGalaModal(wonBallon) {
+            let modalOverlay = document.getElementById('modalOverlay');
+            let ballonModal = document.getElementById('ballonModal');
+            let resText = document.getElementById('ballonResultText');
+            let totyBx = document.getElementById('totyGridContainer');
+
+            modalOverlay.classList.remove('hidden');
+            ballonModal.classList.remove('hidden');
+
+            if (wonBallon) {
+                resText.innerHTML = `<strong style="color:var(--gold); font-size:1.2rem;">🥇 BALLON D'OR ÖDÜLÜNÜ KAZANDIN!</strong><br>Sezonluk harika performansın ödüllendirildi (+100.000 Takipçi).`;
+                p.followers += 100000;
+            } else {
+                resText.innerHTML = `Bu sezon Ballon d'Or ödülünü <strong style="color:var(--accent);">C. Aranda</strong> kazandı. Aday listesinde yer aldın!`;
+            }
+
+            totyBx.innerHTML = `
+                <div class="toty-card">KL: M. Thorne</div>
+                <div class="toty-card">DF: D. Santos</div>
+                <div class="toty-card">DF: J. Lindholm</div>
+                <div class="toty-card">OS: J. Sterling</div>
+                <div class="toty-card ${p.ovr >= 80 ? 'user' : ''}">${p.ovr >= 80 ? p.name + ' (Sen)' : 'OS: K. Vance'}</div>
+                <div class="toty-card">OS: A. Fischer</div>
+                <div class="toty-card">FV: V. Santos</div>
+                <div class="toty-card ${p.goals >= 20 ? 'user' : ''}">${p.goals >= 20 ? p.name + ' (Sen)' : 'FV: E. Lindqvist'}</div>
+                <div class="toty-card">FV: C. Aranda</div>
+            `;
+        }
+
+        function openNationalModal() {
+            if (p.ovr < 78) {
+                alert("A Milli Takım için en az 78 OVR gücüne ulaşmalısın!");
+                return;
+            }
+
+            let modalOverlay = document.getElementById('modalOverlay');
+            let natModal = document.getElementById('nationalModal');
+            modalOverlay.classList.remove('hidden');
+            natModal.classList.remove('hidden');
+
+            document.getElementById('natCoachTrustModal').innerText = `%${p.nationalCoachTrust}`;
+            document.getElementById('natCaptainModalStatus').innerHTML = p.isNationalCaptain ? `<strong style="color:var(--gold);">👑 A MİLLİ TAKIM KAPTANI</strong>` : `<strong style="color:var(--text-muted);">Normal Oyuncu</strong>`;
+
+            let fixtureBx = document.getElementById('nationalFixtureBox');
+            if (p.nationalTournament) {
+                document.getElementById('nationalCupTitle').innerText = `🇹🇷 ${p.nationalTournament.title}`;
+                fixtureBx.innerHTML = `
+                    <div style="background:rgba(239,68,68,0.2); padding:10px; border-radius:8px; border:1px solid var(--danger);">
+                        <h4>Aşama: ${p.nationalTournament.stage}</h4>
+                        <p style="font-size:1rem; margin-top:6px;"><strong>Türkiye 🇹🇷 vs ${p.nationalTournament.opponents[p.nationalTournament.currentMatch] || 'Brezilya'}</strong></p>
+                    </div>`;
+            } else {
+                fixtureBx.innerHTML = `<p style="font-size:0.8rem;">Resmi turnuva fikstürleri sezon sonlarında aktif olmaktadır.</p>`;
+            }
+        }
+
+        function praiseNationalCoach() {
+            p.nationalCoachTrust = Math.min(100, p.nationalCoachTrust + 10);
+            document.getElementById('natCoachTrustModal').innerText = `%${p.nationalCoachTrust}`;
+            log(`🗣️ Milli Hoca Güveni +10 arttı. (%${p.nationalCoachTrust})`);
+            saveGame();
+        }
+
+        function claimNationalCaptaincy() {
+            if (p.natMatches < 15) { alert("Kaptanlık için en az 15 Milli Maç oynamalısın! Mevcut: " + p.natMatches); return; }
+            if (p.nationalCoachTrust < 80) { alert("Milli Hoca Güveni en az %80 olmalı! Mevcut: %" + p.nationalCoachTrust); return; }
+            if (p.ovr < 82) { alert("Milli Takım Kaptanı olmak için en az 82 OVR gerekir!"); return; }
+
+            p.isNationalCaptain = true;
+            p.followers += 25000;
+            document.getElementById('natCaptainModalStatus').innerHTML = `<strong style="color:var(--gold);">👑 A MİLLİ TAKIM KAPTANI</strong>`;
+            log("👑 TEBRİKLER! A Milli Takım Kaptanı oldun! (+25.000 Takipçi)");
+            updateUI(); saveGame();
+        }
+
+        function playNationalMatch() {
+            p.natMatches++;
+            let g = Math.random() > 0.5 ? 1 : 0;
+            p.natGoals += g;
+
+            p.nationalCoachTrust = Math.min(100, p.nationalCoachTrust + (g > 0 ? 5 : 2));
+
+            if (p.nationalTournament) {
+                p.nationalTournament.currentMatch++;
+                if (p.nationalTournament.currentMatch >= 3) {
+                    p.trophies.national++;
+                    alert("🎉 MİLLİ TAKIMLA DÜNYA KUPASI / EURO ŞAMPİYONU OLDUNUZ!");
+                    p.nationalTournament = null;
+                } else {
+                    p.nationalTournament.stage = "Yarı Final / Final";
+                    alert(`🔴⚪ MİLLİ MAÇ KAZANILDI! Tur atladınız! Katkın: +${g} Gol`);
+                }
+            } else {
+                alert(`🔴⚪ Milli hazırlık maçı tamamlandı. Katkın: +${g} Gol`);
+            }
+
+            closeModal();
+            updateUI(); saveGame();
+        }
+
+        function treatInjury(type) {
+            if (p.injuryWeeks <= 0) return;
+            if (type === 'physio' && p.money >= 50000) {
+                p.money -= 50000;
+                p.injuryWeeks = Math.max(0, p.injuryWeeks - 1);
+                log("👨‍⚕️ Özel Fizyoterapist tedavisi uygulandı! (-1 Hafta)");
+            } else if (type === 'camp' && p.money >= 200000) {
+                p.money -= 200000;
+                p.injuryWeeks = Math.max(0, p.injuryWeeks - 3);
+                log("🇨🇭 İsviçre Rehab Kampı tamamlandı! (-3 Hafta)");
+            } else {
+                alert("Tedavi için paran yetersiz!");
+                return;
+            }
+
+            if (p.injuryWeeks <= 0) {
+                p.injuryType = null;
+                log("✅ SAKATLIK İYİLEŞTİ! Yeniden sahalardasın.");
+            }
+            updateUI(); saveGame();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            document.getElementById('ballonModal').classList.add('hidden');
+            document.getElementById('nationalModal').classList.add('hidden');
+        }
+
+        function saveGame() { localStorage.setItem('careerSave', JSON.stringify(p)); }
+
+        function loadGame() {
+            let save = localStorage.getItem('careerSave');
+            if (save) {
+                p = JSON.parse(save);
+                if (p.careerMatches === undefined) p.careerMatches = p.matches || 0;
+                if (p.careerGoals === undefined) p.careerGoals = p.goals || 0;
+                if (p.careerAssists === undefined) p.careerAssists = p.assists || 0;
+                if (p.natMatches === undefined) p.natMatches = 0;
+                if (p.natGoals === undefined) p.natGoals = 0;
+                if (p.nationalCoachTrust === undefined) p.nationalCoachTrust = 50;
+                if (p.isNationalCaptain === undefined) p.isNationalCaptain = false;
+                if (p.injuryType === undefined) p.injuryType = null;
+                if (p.contractYears === undefined) p.contractYears = 3;
+                if (p.renewedThisSeason === undefined) p.renewedThisSeason = false;
+                if (p.technique === undefined) p.technique = 65;
+                if (p.trainedThisWeek === undefined) p.trainedThisWeek = false;
+                if (p.coachTrust === undefined) p.coachTrust = 50;
+                if (p.weeklyWage === undefined) p.weeklyWage = Math.floor(p.ovr * 200);
+                if (p.lastPraiseWeek === undefined) p.lastPraiseWeek = -6;
+                if (p.followers === undefined) p.followers = 5000;
+                if (p.injuryWeeks === undefined) p.injuryWeeks = 0;
+                if (p.isSuspended === undefined) p.isSuspended = false;
+                if (p.yellowCardsThisSeason === undefined) p.yellowCardsThisSeason = 0;
+                if (!p.sponsorOffers) p.sponsorOffers = [];
+                if (!p.unlockedSkills) p.unlockedSkills = [];
+                if (!p.assets) p.assets = [];
+                if (!p.ownedStoreItems) p.ownedStoreItems = [];
+                if (!p.trophies) p.trophies = { ballon: 0, national: 0, boot: 0, league: 0, euro: 0, topScorer: 0, assistLeader: 0 };
+                if (!p.leagueTable || p.leagueTable.length === 0 || !p.fullSeasonSchedule || p.fullSeasonSchedule.length === 0) initLeagueTable();
+                if (!p.teamSquad || p.teamSquad.length === 0) generateSquadForClub(p.club);
+
+                calculateOvr();
+                calculateRealValue();
+                document.getElementById('setup-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                updateUI(); log("📂 Kayıt yüklendi!");
+            } else { alert("Kayıtlı oyun bulunamadı!"); }
+        }
+
+        function resetGame() { if (confirm("Kariyerini sıfırlamak istediğine emin misin?")) { localStorage.removeItem('careerSave'); location.reload(); } }
+
+        function buyPremiumPass() {
+            if (p.isPremium) { alert("Zaten VIP Premium Pass abonesisin!"); return; }
+            if (confirm("$1.00 tutarında Premium Pass üyeliğini onaylıyor musun?")) {
+                p.isPremium = true;
+                log("⭐ VIP Premium Pass aktif edildi!");
+                updateUI(); saveGame();
+            }
+        }
+
+        function buyPrimeBoot() {
+            if (p.ownedStoreItems.includes("Prime Titan Krampon ⚡ ($0.49)")) {
+                alert("Bu krampona zaten sahipsin!"); return;
+            }
+            if (confirm("$0.49 tutarındaki Prime Titan Kramponu almak istiyor musun?")) {
+                p.ownedStoreItems.push("Prime Titan Krampon ⚡ ($0.49)");
+                p.equippedBoots = "Prime Titan Krampon ⚡ ($0.49)";
+                calculateOvr();
+                calculateRealValue();
+                log("⚡ PRIME KRAMPON ALINDI VE GİYİLDİ!");
+                updateUI(); saveGame();
+            }
+        }
+
+        function claimDailyReward() {
+            p.money += 250000;
+            log("🎁 Günlük Ödül (€250.000) alındı!");
+            updateUI(); saveGame();
+        }
+
+        function investTrade(type) {
+            if (p.money >= 100000) {
+                p.money -= 100000;
+                if(type === 'gold') p.investGold += 100000;
+                else p.investSp += 100000;
+                log(`📈 Borsa Yatırımı Yapıldı (€100.000)`);
+                updateUI(); saveGame();
+            } else { alert("Yetersiz Bakiye!"); }
+        }
+
+        function buyLife(type) {
+            if (type === 'marriage' && p.money >= 1500000) {
+                p.money -= 1500000; p.morale = 100; log("❤️ Düğün Yapıldı! Moral %100");
+            } else if (type === 'child' && p.money >= 500000) {
+                p.money -= 500000; log("👶 Çocuk Sahibi Olundu!");
+            } else { alert("Yetersiz Bakiye!"); }
+            updateUI(); saveGame();
+        }
+
+        function coachTalk(type) {
+            if (type === 'praise') {
+                if (p.week - p.lastPraiseWeek >= 6) {
+                    p.coachTrust = Math.min(100, p.coachTrust + 10);
+                    p.lastPraiseWeek = p.week;
+                    log(`🗣️ Hoca güveni +10 arttı. (Mevcut: %${p.coachTrust})`);
+                } else {
+                    let remainingWeeks = 6 - (p.week - p.lastPraiseWeek);
+                    alert(`Hocayı 6 haftada bir övebilirsin! Kalan: ${remainingWeeks} hafta.`);
+                    return;
+                }
+            } else if (type === 'raise') {
+                if (p.lastRating >= 7.5 && p.coachTrust >= 60) {
+                    let raiseAmount = Math.floor(p.weeklyWage * 0.20);
+                    p.weeklyWage += raiseAmount;
+                    log(`💰 Maaşına %20 zam yapıldı. Yeni Maaş: ${formatMoney(p.weeklyWage)}/Hafta`);
+                } else {
+                    alert("Maaş zammı için son reytingin ≥ 7.5 ve Hoca Güveninin ≥ %60 olması gerekir!");
+                    return;
+                }
+            }
+            updateUI(); saveGame();
+        }
+
+        function handlePressAnswer(answerType) {
+            document.getElementById('press-zone').classList.add('hidden');
+            if (answerType === 'humble') {
+                p.coachTrust = Math.min(100, p.coachTrust + 2);
+                p.followers += 2000;
+                log("🎙️ Mütevazı açıklama: Hoca Güveni +2, Takipçi +2.000");
+            } else if (answerType === 'confident') {
+                p.followers += 5000;
+                p.morale = Math.min(100, p.morale + 5);
+                log("🎙️ Özgüvenli açıklama: Takipçi +5.000, Moral +5");
+            } else if (answerType === 'aggressive') {
+                p.followers += 15000;
+                p.coachTrust = Math.max(0, p.coachTrust - 3);
+                log("🎙️ İddialı açıklama: Takipçi +15.000, Hoca -3");
+            }
+            updateUI(); saveGame();
+        }
+
+        function setLeaderboardSort(mode) {
+            leaderboardSortMode = mode;
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const body = document.getElementById('leaderboardBody');
+            if (!body) return;
+            body.innerHTML = "";
+
+            let userObj = { name: `${p.name} (Sen)`, club: p.club, ovr: p.ovr, value: p.value, isUser: true };
+            let list = [...globalPlayers, userObj];
+
+            if (leaderboardSortMode === 'ovr') {
+                list.sort((a, b) => b.ovr - a.ovr);
+            } else {
+                list.sort((a, b) => b.value - a.value);
+            }
+
+            list.forEach((item, index) => {
+                let rowClass = item.isUser ? 'class="user-row"' : '';
+                body.innerHTML += `
+                    <tr ${rowClass}>
+                        <td>#${index + 1}</td>
+                        <td>${item.name}</td>
+                        <td>${item.club}</td>
+                        <td><strong style="color:var(--gold);">${item.ovr}</strong></td>
+                        <td>${formatMoney(item.value)}</td>
+                    </tr>`;
+            });
+        }
+
+        function processLeagueMatchResults(userGoalContribution) {
+            let currentRoundIndex = Math.min(37, p.week - 1);
+            let roundObj = p.fullSeasonSchedule[currentRoundIndex];
+
+            if (roundObj) {
+                roundObj.matches.forEach(fix => {
+                    let hG = 0, aG = 0;
+                    let isUserMatch = (fix.home === p.club || fix.away === p.club);
+
+                    if (isUserMatch) {
+                        let baseTeamScore = Math.floor(Math.random() * 2);
+                        if (fix.home === p.club) {
+                            hG = baseTeamScore + userGoalContribution;
+                            aG = Math.floor(Math.random() * 3);
+                        } else {
+                            aG = baseTeamScore + userGoalContribution;
+                            hG = Math.floor(Math.random() * 3);
+                        }
+                    } else {
+                        hG = Math.floor(Math.random() * 4);
+                        aG = Math.floor(Math.random() * 3);
+                    }
+
+                    fix.homeGoals = hG;
+                    fix.awayGoals = aG;
+                    fix.played = true;
+
+                    let hTeam = p.leagueTable.find(t => t.club === fix.home);
+                    let aTeam = p.leagueTable.find(t => t.club === fix.away);
+
+                    if (hTeam && aTeam) {
+                        hTeam.om++; aTeam.om++;
+                        hTeam.ag += hG; hTeam.yg += aG;
+                        aTeam.ag += aG; aTeam.yg += hG;
+
+                        if (hG > aG) { hTeam.g++; hTeam.pts += 3; aTeam.m++; }
+                        else if (aG > hG) { aTeam.g++; aTeam.pts += 3; hTeam.m++; }
+                        else { hTeam.b++; hTeam.pts += 1; aTeam.b++; aTeam.pts += 1; }
+
+                        hTeam.av = hTeam.ag - hTeam.yg;
+                        aTeam.av = aTeam.ag - aTeam.yg;
+                    }
+                });
+            }
+
+            let euroMatch = p.euroSchedule.find(m => m.week === p.week);
+            if (euroMatch && p.euroQualification) {
+                let eHG = Math.floor(Math.random() * 2) + (euroMatch.home === p.club ? userGoalContribution : 0);
+                let eAG = Math.floor(Math.random() * 2) + (euroMatch.away === p.club ? userGoalContribution : 0);
+                
+                euroMatch.homeGoals = eHG;
+                euroMatch.awayGoals = eAG;
+                euroMatch.played = true;
+
+                let hE = p.euroTable.find(t => t.club === euroMatch.home);
+                let aE = p.euroTable.find(t => t.club === euroMatch.away);
+
+                if (hE && aE) {
+                    hE.om++; aE.om++; hE.ag += eHG; hE.yg += eAG; aE.ag += eAG; aE.yg += eHG;
+                    if (eHG > eAG) { hE.g++; hE.pts += 3; aE.m++; }
+                    else if (eAG > eHG) { aE.g++; aE.pts += 3; hE.m++; }
+                    else { hE.b++; hE.pts += 1; aE.b++; aE.pts += 1; }
+                    hE.av = hE.ag - hE.yg; aE.av = aE.ag - aE.yg;
+                }
+                log(`🇪🇺 AVRUPA MAÇI: ${euroMatch.home} ${eHG} - ${eAG} ${euroMatch.away}`);
+            }
+
+            sortLeagueTable();
+            sortEuroTable();
+        }
+
+        function sortLeagueTable() {
+            p.leagueTable.sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.av !== a.av) return b.av - a.av;
+                return b.ag - a.ag;
+            });
+        }
+
+        function sortEuroTable() {
+            if (!p.euroTable) return;
+            p.euroTable.sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.av !== a.av) return b.av - a.av;
+                return b.ag - a.ag;
+            });
+        }
+
+        function checkDynamicSponsors() {
+            let basePay = Math.floor(p.value * 0.0012) + (p.ovr * 150) + Math.floor(p.followers / 100) * 10;
+            p.sponsorOffers = [
+                { id: 1, name: "Red Bull Athlete", weeklyPay: Math.floor(basePay * 1.3), reqOvr: 65, duration: "1 Sezon" },
+                { id: 2, name: "Nike Pro Global", weeklyPay: Math.floor(basePay * 1.6), reqOvr: 72, duration: "1 Sezon" },
+                { id: 3, name: "Adidas Prime Athlete", weeklyPay: Math.floor(basePay * 2.0), reqOvr: 80, duration: "2 Sezon" }
+            ].filter(s => p.ovr >= s.reqOvr - 5);
+        }
+
+        function acceptSponsorOffer(id) {
+            let offer = p.sponsorOffers.find(s => s.id === id);
+            if (offer) {
+                if (p.ovr < offer.reqOvr) {
+                    alert(`Yetersiz OVR! Gereken: ${offer.reqOvr}`);
+                    return;
+                }
+                p.activeSponsor = offer;
+                log(`💼 YENİ SPONSOR İMZALANDI: ${offer.name} (${formatMoney(offer.weeklyPay)}/Hafta)`);
+                updateUI(); saveGame();
+            }
+        }
+
+        function switchTableSubTab(sub) {
+            document.getElementById('btnSubTabLeague').classList.remove('active');
+            document.getElementById('btnSubTabEuro').classList.remove('active');
+            document.getElementById('subTabLeagueBox').classList.add('hidden');
+            document.getElementById('subTabEuroBox').classList.add('hidden');
+
+            if (sub === 'league') {
+                document.getElementById('btnSubTabLeague').classList.add('active');
+                document.getElementById('subTabLeagueBox').classList.remove('hidden');
+            } else {
+                document.getElementById('btnSubTabEuro').classList.add('active');
+                document.getElementById('subTabEuroBox').classList.remove('hidden');
+            }
+        }
+
+        function renderTableUI() {
+            let bx = document.getElementById('leagueTableBox'); 
+            let myFxBx = document.getElementById('myTeamSeasonFixtureBox');
+            if(!bx || !myFxBx) return;
+
+            let html = `
+            <table class="league-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="text-align:left;">Takım</th>
+                        <th>OM</th>
+                        <th>G</th>
+                        <th>B</th>
+                        <th>M</th>
+                        <th>AV</th>
+                        <th>P</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            let totalTeams = p.leagueTable.length;
+            p.leagueTable.forEach((t, index) => {
+                let isMine = t.club === p.club;
+                let zoneClass = "";
+                if (index < 3) zoneClass = "zone-ucl";
+                else if (index < 5) zoneClass = "zone-uel";
+                else if (index === 5) zoneClass = "zone-uecl";
+                else if (index >= totalTeams - 3) zoneClass = "zone-relegation";
+
+                html += `
+                <tr class="${isMine ? 'my-team' : ''} ${zoneClass}">
+                    <td>${index + 1}</td>
+                    <td style="text-align:left;">${t.club}</td>
+                    <td>${t.om}</td>
+                    <td>${t.g}</td>
+                    <td>${t.b}</td>
+                    <td>${t.m}</td>
+                    <td>${t.av > 0 ? '+' + t.av : t.av}</td>
+                    <td><strong style="color:var(--gold);">${t.pts}</strong></td>
+                </tr>`;
+            });
+
+            html += `</tbody></table>`;
+            bx.innerHTML = html;
+
+            document.getElementById('dispTeamFixtureTitle').innerText = `${p.club} - Sezon Fikstürü`;
+            let teamFxHtml = "";
+
+            p.fullSeasonSchedule.forEach(round => {
+                let myMatch = round.matches.find(m => m.home === p.club || m.away === p.club);
+                if (myMatch) {
+                    let isCurrentWeek = round.week === p.week;
+                    let scoreDisplay = myMatch.played ? `${myMatch.homeGoals} - ${myMatch.awayGoals}` : "v";
+                    teamFxHtml += `
+                    <div class="fixture-card ${isCurrentWeek ? 'current-match-highlight' : ''}">
+                        <div style="font-weight:bold; color:var(--text-muted); font-size:0.7rem; width:45px;">Hft ${round.week}</div>
+                        <div class="fixture-teams" style="justify-content: flex-end;">
+                            <span style="${myMatch.home === p.club ? 'color:var(--gold); font-weight:bold;' : ''}">${myMatch.home}</span>
+                        </div>
+                        <div class="fixture-vs">
+                            <span class="fixture-score">${scoreDisplay}</span>
+                        </div>
+                        <div class="fixture-teams" style="justify-content: flex-start;">
+                            <span style="${myMatch.away === p.club ? 'color:var(--gold); font-weight:bold;' : ''}">${myMatch.away}</span>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            myFxBx.innerHTML = teamFxHtml;
+
+            let euroBx = document.getElementById('euroTableBox');
+            let euroFxBx = document.getElementById('euroFixtureBox');
+            if (p.euroQualification && p.euroTable.length > 0) {
+                let eHtml = `<table class="league-table"><thead><tr><th>#</th><th style="text-align:left;">Takım</th><th>OM</th><th>G</th><th>B</th><th>M</th><th>AV</th><th>P</th></tr></thead><tbody>`;
+                p.euroTable.forEach((t, index) => {
+                    let isMine = t.club === p.club;
+                    eHtml += `<tr class="${isMine ? 'my-team' : ''}"><td>${index + 1}</td><td style="text-align:left;">${t.club}</td><td>${t.om}</td><td>${t.g}</td><td>${t.b}</td><td>${t.m}</td><td>${t.av > 0 ? '+' + t.av : t.av}</td><td><strong style="color:var(--blue);">${t.pts}</strong></td></tr>`;
+                });
+                eHtml += `</tbody></table>`;
+                euroBx.innerHTML = eHtml;
+
+                let eFxHtml = "";
+                p.euroSchedule.forEach(m => {
+                    let score = m.played ? `${m.homeGoals} - ${m.awayGoals}` : "v";
+                    eFxHtml += `
+                    <div class="fixture-card ${m.week === p.week ? 'current-match-highlight' : ''}">
+                        <div style="font-weight:bold; color:var(--text-muted); font-size:0.7rem; width:45px;">Hft ${m.week}</div>
+                        <div class="fixture-teams" style="justify-content: flex-end;"><span style="${m.home === p.club ? 'color:var(--gold); font-weight:bold;' : ''}">${m.home}</span></div>
+                        <div class="fixture-vs"><span class="fixture-score">${score}</span></div>
+                        <div class="fixture-teams" style="justify-content: flex-start;"><span style="${m.away === p.club ? 'color:var(--gold); font-weight:bold;' : ''}">${m.away}</span></div>
+                    </div>`;
+                });
+                euroFxBx.innerHTML = eFxHtml;
+            } else {
+                euroBx.innerHTML = "<p>Takımın bu sezon Avrupa kupalarına katılamadı.</p>";
+                euroFxBx.innerHTML = "<p>Fikstür yok.</p>";
+            }
+
+            document.getElementById('coachTrustText').innerText = `%${p.coachTrust}`;
+            document.getElementById('dispWeeklyWageText').innerText = `${formatMoney(p.weeklyWage)} / Hafta`;
+            let coachStatusEl = document.getElementById('coachStatusText');
+            if (p.coachTrust < 50) {
+                coachStatusEl.innerHTML = `<span style="color:var(--danger);">🔴 KADRO DIŞI! (Hoca güveni %50 altında)</span>`;
+            } else if (p.injuryWeeks > 0) {
+                coachStatusEl.innerHTML = `<span style="color:var(--danger);">🏥 SAKAT (${p.injuryType || 'Sakatlık'} - ${p.injuryWeeks} Hft)</span>`;
+            } else if (p.isSuspended) {
+                coachStatusEl.innerHTML = `<span style="color:var(--danger);">🟨 KART CEZALI (1 Maç Oynayamaz)</span>`;
+            } else {
+                coachStatusEl.innerHTML = `<span style="color:var(--accent);">🟢 KADRODA (İlk 11 oyuncususun)</span>`;
+            }
+
+            let praiseBtn = document.getElementById('btnPraiseCoach');
+            let cdInfo = document.getElementById('praiseCooldownInfo');
+            let diffWeek = p.week - p.lastPraiseWeek;
+            if (diffWeek < 6) {
+                praiseBtn.disabled = true;
+                cdInfo.innerText = `⏳ Tekrar övmek için ${6 - diffWeek} hafta bekle.`;
+            } else {
+                praiseBtn.disabled = false;
+                cdInfo.innerText = `✅ Hocayı övmeye hazırsın!`;
+            }
+
+            renderDynamicSponsors();
+        }
+
+        function renderDynamicSponsors() {
+            let container = document.getElementById('dynamic-sponsors-list');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (p.activeSponsor) {
+                container.innerHTML += `<div class="stat-item" style="border-color:var(--gold); margin-bottom:8px;">
+                    <div><strong style="color:var(--gold);">Aktif: ${p.activeSponsor.name}</strong> (${formatMoney(p.activeSponsor.weeklyPay)}/Hft)</div>
+                    <span class="badge badge-purple">Aktif</span>
+                </div>`;
+            }
+
+            p.sponsorOffers.forEach(s => {
+                let isCurrent = p.activeSponsor && p.activeSponsor.id === s.id;
+                container.innerHTML += `
+                    <div class="stat-item" style="margin-bottom:6px;">
+                        <div>
+                            <strong>${s.name}</strong> - <span style="color:var(--accent); font-weight:bold;">${formatMoney(s.weeklyPay)}/Hft</span>
+                            <br><small style="color:var(--text-muted);">Gereken OVR: ${s.reqOvr}</small>
+                        </div>
+                        <button class="btn ${isCurrent ? 'btn-gold' : 'btn-purple'}" style="width:auto; padding:5px 10px; min-height:34px;" ${isCurrent ? 'disabled' : ''} onclick="acceptSponsorOffer(${s.id})">
+                            ${isCurrent ? 'Mevcut' : 'İmzala'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function renderContractUI() {
+            document.getElementById('cModalClub').innerText = p.club;
+            document.getElementById('cModalYears').innerText = `${p.contractYears} Yıl`;
+            document.getElementById('cModalWage').innerText = `${formatMoney(p.weeklyWage)}/Hafta`;
+            document.getElementById('cModalRelease').innerText = formatMoney(p.releaseClause);
+
+            let bosmanBx = document.getElementById('bosmanOffersBox');
+            if (p.contractYears <= 1) {
+                let signingBonus = Math.floor(p.value * 0.4);
+                bosmanBx.innerHTML = `
+                    <div style="background:rgba(251,191,36,0.15); padding:10px; border-radius:8px; border:1px solid var(--gold);">
+                        <strong style="color:var(--gold);">📜 Bosman Fırsatı Aktif!</strong>
+                        <p style="font-size:0.78rem; margin-top:4px;">Ücretsiz transfer olarak başka kulübe geç ve <strong>${formatMoney(signingBonus)} İmza Parası</strong> kazan!</p>
+                        <button class="btn btn-gold" style="margin-top:6px;" onclick="acceptBosmanOffer(${signingBonus})">Bosman İle Yeni Takıma Geç</button>
+                    </div>`;
+            } else {
+                bosmanBx.innerHTML = "<p style='font-size:0.78rem;'>Sözleşmenizin son yılında Bosman teklifleri aktif olacaktır.</p>";
+            }
+        }
+
+        function renewContractWithClub() {
+            if (p.renewedThisSeason) {
+                alert("⚠️ Bu sezon zaten yeni sözleşme imzaladın!");
+                return;
+            }
+
+            if (p.contractYears > 2) {
+                alert("⚠️ Sözleşmenin bitmesine uzun bir süre var (" + p.contractYears + " Yıl).");
+                return;
+            }
+
+            if (p.coachTrust < 65) {
+                alert("⚠️ Hoca Güveni en az %65 olmalı! Mevcut: %" + p.coachTrust);
+                return;
+            }
+
+            if (p.lastRating < 6.8) {
+                alert("⚠️ Son reytingin en az 6.8 olmalı! Mevcut: " + p.lastRating);
+                return;
+            }
+
+            let signingBonus = Math.floor(p.value * 0.15);
+            p.contractYears = Math.min(5, p.contractYears + 3);
+            p.weeklyWage = Math.floor(p.weeklyWage * 1.25);
+            p.money += signingBonus;
+            p.renewedThisSeason = true;
+
+            log(`✍️ SÖZLEŞME UZATILDI! Yeni Süre: ${p.contractYears} Yıl | Maaş: ${formatMoney(p.weeklyWage)} | İmza Parası: ${formatMoney(signingBonus)}`);
+            updateUI(); 
+            saveGame();
+        }
+
+        function acceptBosmanOffer(signingBonus) {
+            let lgs = Object.keys(leagueClubs);
+            let newLg = lgs[Math.floor(Math.random() * lgs.length)];
+            let newCl = leagueClubs[newLg].filter(c => c !== p.club)[0];
+            
+            p.league = newLg;
+            p.club = newCl;
+            p.contractYears = 3;
+            p.money += signingBonus;
+            p.weeklyWage = Math.floor(p.weeklyWage * 1.35);
+            
+            generateSquadForClub(p.club);
+            log(`🎉 BOSMAN İLE TRANSFER OLDUN! Yeni Takım: ${newCl} | İmza Parası: ${formatMoney(signingBonus)}`);
+            updateUI(); saveGame();
+        }
+
+        function updateUI() {
+            calculateOvr();
+            calculateRealValue();
+            checkDynamicSponsors();
+
+            let currentYear = p.startYear + Math.floor((p.week - 1) / 38);
+            let sponsorPay = p.activeSponsor ? p.activeSponsor.weeklyPay : 0;
+            let totalWeeklyIncome = p.weeklyWage + sponsorPay;
+
+            document.getElementById('dispSeason').innerText = `${currentYear}/${(currentYear+1).toString().slice(2)}`;
+            document.getElementById('dispName').innerText = `${p.name} (${p.age} Yaş - ${p.pos})`;
+            document.getElementById('dispClubInfo').innerText = `Kulüp: ${p.club} | Gelir: ${formatMoney(totalWeeklyIncome)}/Hft | Kasa: ${formatMoney(p.money)}`;
+            document.getElementById('dispEquipInfo').innerHTML = `Forma #: <strong>${p.kitNumber}</strong> | Krampon: <strong>${p.equippedBoots}</strong>`;
+            document.getElementById('dispContractYears').innerText = `${p.contractYears} Yıl Kalan`;
+            document.getElementById('dispReleaseClause').innerText = formatMoney(p.releaseClause);
+            document.getElementById('dispAgentName').innerText = p.agent;
+            document.getElementById('dispFollowers').innerText = p.followers.toLocaleString('tr-TR');
+            document.getElementById('dispOvr').innerText = p.ovr;
+            document.getElementById('cardName').innerText = p.name.split(' ').pop().toUpperCase();
+            document.getElementById('cardPos').innerText = p.pos;
+            document.getElementById('cardKitNum').innerText = `#${p.kitNumber}`;
+
+            document.getElementById('statMatches').innerText = p.matches;
+            document.getElementById('totalCareerMatches').innerText = p.careerMatches;
+            document.getElementById('statGoals').innerText = p.goals;
+            document.getElementById('statAssists').innerText = p.assists;
+            document.getElementById('totalCareerGoals').innerText = p.careerGoals;
+            document.getElementById('totalCareerAssists').innerText = p.careerAssists;
+            document.getElementById('natMatches').innerText = p.natMatches;
+            document.getElementById('natGoals').innerText = p.natGoals;
+            document.getElementById('statLastRating').innerText = `${p.lastRating}`;
+            document.getElementById('statXpDisplay').innerText = `${p.xp} XP`;
+            document.getElementById('statValueDisplay').innerText = formatMoney(p.value);
+            document.getElementById('skillTreeXpText').innerText = `${p.xp} XP`;
+
+            document.getElementById('barCond').style.width = `${p.cond}%`;
+            document.getElementById('barMorale').style.width = `${p.morale}%`;
+            document.getElementById('statWeek').innerText = (p.week > 38) ? 38 : p.week;
+
+            document.getElementById('investGoldVal').innerText = formatMoney(p.investGold);
+            document.getElementById('investSpVal').innerText = formatMoney(p.investSp);
+
+            let boot = bootsList.find(b => b.name === p.equippedBoots) || {};
+            document.getElementById('attrPace').innerText = p.pace + (boot.pace || 0);
+            document.getElementById('attrShooting').innerText = p.shooting + (boot.sho || 0);
+            document.getElementById('attrPassing').innerText = p.passing + (boot.pas || 0);
+            document.getElementById('attrDribble').innerText = p.dribble;
+            document.getElementById('attrDefense').innerText = p.defense;
+            document.getElementById('attrPhysical').innerText = p.physical;
+            document.getElementById('attrTechnique').innerText = p.technique || 65;
+
+            ['btnTrainFit', 'btnTrainTech', 'btnTrainTact', 'btnTrainDribble'].forEach(id => {
+                let btn = document.getElementById(id);
+                if (btn) btn.disabled = p.trainedThisWeek || p.injuryWeeks > 0;
+            });
+
+            if (p.ovr >= 78) document.getElementById('nationalBadge').classList.remove('hidden');
+            else document.getElementById('nationalBadge').classList.add('hidden');
+
+            if (p.isNationalCaptain) document.getElementById('nationalCaptainBadge').classList.remove('hidden');
+            else document.getElementById('nationalCaptainBadge').classList.add('hidden');
+
+            if (p.contractYears <= 1) document.getElementById('bosmanBadge').classList.remove('hidden');
+            else document.getElementById('bosmanBadge').classList.add('hidden');
+
+            if (p.injuryWeeks > 0) {
+                document.getElementById('statusInjuryBadge').classList.remove('hidden');
+                document.getElementById('injuryTreatmentBox').classList.remove('hidden');
+                document.getElementById('injuryDiagnosisText').innerText = p.injuryType || "Kas Yırtılması";
+                document.getElementById('injuryWeeksText').innerText = `${p.injuryWeeks} Hafta`;
+            } else {
+                document.getElementById('statusInjuryBadge').classList.add('hidden');
+                document.getElementById('injuryTreatmentBox').classList.add('hidden');
+            }
+
+            if (p.isSuspended) document.getElementById('statusSuspendedBadge').classList.remove('hidden');
+            else document.getElementById('statusSuspendedBadge').classList.add('hidden');
+
+            if (p.isPremium) {
+                document.getElementById('adBannerBox').style.display = 'none';
+                document.getElementById('premiumBadge').classList.remove('hidden');
+                document.getElementById('dailyRewardBox').classList.remove('hidden');
+                document.getElementById('btnBuyPremium').innerText = "✅ VIP Üyelik Aktif";
+                document.getElementById('btnBuyPremium').disabled = true;
+            } else {
+                document.getElementById('adBannerBox').style.display = 'block';
+                document.getElementById('premiumBadge').classList.add('hidden');
+                document.getElementById('dailyRewardBox').classList.add('hidden');
+            }
+
+            if (p.ownedStoreItems.includes("Prime Titan Krampon ⚡ ($0.49)")) {
+                document.getElementById('btnBuyPrimeBoot').innerText = "✅ Satın Alındı";
+                document.getElementById('btnBuyPrimeBoot').disabled = true;
+            }
+
+            document.getElementById('trophyBallon').innerText = p.trophies.ballon;
+            document.getElementById('trophyNational').innerText = p.trophies.national || 0;
+            document.getElementById('trophyBoot').innerText = p.trophies.boot + (p.trophies.topScorer || 0);
+            document.getElementById('trophyLeague').innerText = p.trophies.league;
+            document.getElementById('trophyEuro').innerText = p.trophies.euro;
+            document.getElementById('trophyAssist').innerText = p.trophies.assistLeader || 0;
+
+            renderTableUI(); renderLifestyle(); renderTransfers(); renderBoots(); renderSkillTree(); renderAgentTab(); renderLeaderboard(); renderContractUI(); renderSquadUI();
+        }
+
+        function startLiveMatch() {
+            if (p.injuryWeeks > 0) {
+                alert(`🏥 Sakatlığın devam ediyor! (${p.injuryWeeks} Hafta kaldı).`);
+                p.injuryWeeks--;
+                if (p.injuryWeeks <= 0) p.injuryType = null;
+                p.cond = Math.min(100, p.cond + 25);
+                processLeagueMatchResults(0);
+                p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                p.week++;
+                p.trainedThisWeek = false;
+                checkSeasonEnd();
+                updateUI(); saveGame();
+                return;
+            }
+
+            if (p.isSuspended) {
+                alert(`🟨 Kart Cezalısısın! Bu maçta oynayamadın.`);
+                p.isSuspended = false;
+                p.cond = Math.min(100, p.cond + 15);
+                processLeagueMatchResults(0);
+                p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                p.week++;
+                p.trainedThisWeek = false;
+                checkSeasonEnd();
+                updateUI(); saveGame();
+                return;
+            }
+
+            if (p.coachTrust < 50) {
+                alert(`⚠️ Hoca güvenin %${p.coachTrust} olduğu için kadroya alınmadın!`);
+                processLeagueMatchResults(0);
+                p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                p.week++;
+                p.trainedThisWeek = false;
+                checkSeasonEnd();
+                updateUI(); saveGame();
+                return;
+            }
+
+            p.matches++; 
+            p.careerMatches++;
+            p.cond = Math.max(10, p.cond - 25);
+            p.trainedThisWeek = false;
+
+            log(`[Maç Başladı] Hafta ${p.week}`);
+
+            let scenarios = [
+                { type: "freekick", text: "🎯 Ceza sahası dışından frikik kazandınız! Topun başındasın.", reqVal: 65 },
+                { type: "penalty", text: "⚽ 89. dakikada kritik PENALTI! Kaleciyle karşı karşıyasın.", reqVal: 60 },
+                { type: "dribble", text: "⚡ Defansı birebirde yakaladın! Çalım atıp sıyrılma şansı.", reqVal: 65 },
+                { type: "pass", text: "👁️ Defans arkasına harika hareketlenen arkadaşını gördün!", reqVal: 65 }
+            ];
+
+            let curScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            document.getElementById('actionScenarioText').innerText = curScenario.text;
+
+            let btnContainer = document.getElementById('action-buttons');
+            btnContainer.innerHTML = "";
+
+            if (curScenario.type === "freekick") {
+                btnContainer.innerHTML = `
+                    <button class="btn btn-gold" onclick="executeAdvancedAction('freekick_90', ${curScenario.reqVal})">🎯 90'a Frikik</button>
+                    <button class="btn btn-blue" onclick="executeAdvancedAction('freekick_power', ${curScenario.reqVal})">💥 Baraj Üstü Sert Şut</button>`;
+            } else if (curScenario.type === "penalty") {
+                btnContainer.innerHTML = `
+                    <button class="btn btn-gold" onclick="executeAdvancedAction('penalty_corner', ${curScenario.reqVal})">⚽ Köşeye Vur</button>
+                    <button class="btn btn-purple" onclick="executeAdvancedAction('penalty_panenka', ${curScenario.reqVal + 5})">🎩 Panenka Vuruşu</button>`;
+            } else if (curScenario.type === "dribble") {
+                btnContainer.innerHTML = `
+                    <button class="btn btn-gold" onclick="executeAdvancedAction('dribble_skill', ${curScenario.reqVal})">⚡ Birebir Çalım</button>
+                    <button class="btn btn-blue" onclick="executeAdvancedAction('dribble_speed', ${curScenario.reqVal})">🏎️ Deparla Geç</button>`;
+            } else {
+                btnContainer.innerHTML = `
+                    <button class="btn btn-gold" onclick="executeAdvancedAction('pass_killer', ${curScenario.reqVal})">🎯 Kilit Pas At</button>
+                    <button class="btn btn-blue" onclick="executeAdvancedAction('pass_safe', ${curScenario.reqVal - 5})">🤝 Garanti Pas</button>`;
+            }
+
+            document.getElementById('action-zone').classList.remove('hidden');
+        }
+
+        function executeAdvancedAction(actionType, reqVal) {
+            document.getElementById('action-zone').classList.add('hidden');
+            
+            let userStat = p.shooting;
+            if (actionType.includes("dribble")) userStat = p.dribble;
+            if (actionType.includes("pass")) userStat = p.passing;
+
+            let successRoll = Math.random() * 100;
+            let chance = 45 + (userStat - reqVal) * 2;
+            let success = successRoll < chance;
+            let goalsInMatch = 0;
+            let assistsInMatch = 0;
+
+            if (success) {
+                if (actionType.includes("freekick") || actionType.includes("penalty") || actionType.includes("dribble")) {
+                    p.goals++; p.careerGoals++; goalsInMatch = 1;
+                    p.xp += 120;
+                    log(`💥 MUHTEŞEM GOL! Harika bir gol attın! (+120 XP)`);
+                } else {
+                    p.assists++; p.careerAssists++; assistsInMatch = 1;
+                    p.xp += 90;
+                    log(`🎯 HARİKA ASİST! Pasın golle sonuçlandı! (+90 XP)`);
+                }
+            } else {
+                log(`❌ Pozisyon kaçtı.`);
+            }
+
+            processLeagueMatchResults(goalsInMatch);
+            p.week++;
+            finishMatch(success, goalsInMatch, assistsInMatch);
+        }
+
+        function finishMatch(success, goalsInMatch, assistsInMatch) {
+            let rating = parseFloat((6.0 + (success ? 2.5 : 0) + (Math.random() * 1.0)).toFixed(1));
+            p.lastRating = rating; 
+
+            let earnedXp = Math.floor(rating * 20);
+            if (goalsInMatch > 0) earnedXp += (goalsInMatch * 100);
+            if (assistsInMatch > 0) earnedXp += (assistsInMatch * 60);
+            if (success) earnedXp += 80;
+            
+            p.xp += earnedXp;
+            log(`⭐ Reyting: ${rating} | XP: +${earnedXp}`);
+
+            if (p.cond < 30 && Math.random() < 0.35) {
+                let injuryList = [
+                    { type: "Ayak Bileği Burkulması", weeks: Math.floor(Math.random() * 2) + 1 },
+                    { type: "Kas Yırtılması", weeks: Math.floor(Math.random() * 3) + 2 },
+                    { type: "Kasıq Çekmesi", weeks: Math.floor(Math.random() * 2) + 2 },
+                    { type: "Çapraz Bağ Kopması", weeks: Math.floor(Math.random() * 5) + 6 }
+                ];
+                let chosenInjury = injuryList[Math.floor(Math.random() * injuryList.length)];
+                p.injuryWeeks = chosenInjury.weeks;
+                p.injuryType = chosenInjury.type;
+                log(`🚨 SAKATLIK! [${p.injuryType}] ${p.injuryWeeks} hafta yoksun.`);
+            }
+
+            let cardRoll = Math.random();
+            if (cardRoll < 0.15) {
+                p.yellowCards++; p.yellowCardsThisSeason++;
+                log("🟨 Sarı Kart Gördün!");
+                if (p.yellowCardsThisSeason % 4 === 0) {
+                    p.isSuspended = true;
+                    log("⚠️ 4 Sarı Karta Ulaştın! Önümüzdeki maç CEZALISIN.");
+                }
+            } else if (cardRoll < 0.02) {
+                p.redCards++; p.isSuspended = true;
+                log("🟥 Doğrudan KIZMIZI KART Gördün!");
+            }
+
+            if (rating < 6.0) {
+                p.coachTrust = Math.max(0, p.coachTrust - 2);
+            } else if (rating > 6.0) {
+                p.coachTrust = Math.min(100, p.coachTrust + 2);
+            }
+
+            let weeklyIncome = p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+            p.money += weeklyIncome;
+
+            calculateOvr(); calculateRealValue();
+
+            p.historyWeeks.push(p.week); 
+            p.historyOvr.push(p.ovr); 
+            p.historyValue.push(p.value);
+
+            document.getElementById('press-zone').classList.remove('hidden');
+
+            checkTransferOffer(); 
+            checkSeasonEnd();
+            updateUI(); saveGame();
+        }
+
+        function simWeeks(count) {
+            if (!p.isPremium) {
+                alert("🔒 Hızlı Simülasyon Premium Pass abonelerine özeldir!");
+                switchTab('store');
+                return;
+            }
+
+            log(`⏩ ${count} Haftalık simülasyon başlatıldı...`);
+            let gCount = 0, aCount = 0;
+
+            for(let i = 0; i < count; i++) {
+                if (p.injuryWeeks > 0) {
+                    p.injuryWeeks--;
+                    if (p.injuryWeeks <= 0) p.injuryType = null;
+                    p.cond = Math.min(100, p.cond + 20);
+                    processLeagueMatchResults(0);
+                    p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                    p.week++;
+                    checkSeasonEnd();
+                    continue;
+                }
+
+                if (p.isSuspended) {
+                    p.isSuspended = false;
+                    p.cond = Math.min(100, p.cond + 15);
+                    processLeagueMatchResults(0);
+                    p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                    p.week++;
+                    checkSeasonEnd();
+                    continue;
+                }
+
+                if (p.coachTrust < 50) {
+                    processLeagueMatchResults(0);
+                    p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                    p.week++;
+                    p.trainedThisWeek = false;
+                    checkSeasonEnd();
+                    continue;
+                }
+
+                p.matches++; p.careerMatches++;
+                p.trainedThisWeek = false;
+
+                let g = Math.random() > 0.6 ? 1 : 0;
+                let a = Math.random() > 0.65 ? 1 : 0;
+
+                p.goals += g; p.careerGoals += g; gCount += g;
+                p.assists += a; p.careerAssists += a; aCount += a;
+
+                processLeagueMatchResults(g + a);
+
+                p.lastRating = parseFloat((6.0 + (g * 1.5) + (a * 0.8) + (Math.random() * 0.8)).toFixed(1));
+                
+                let earnedXp = Math.floor(p.lastRating * 18) + (g * 90) + (a * 50);
+                p.xp += earnedXp;
+
+                if (p.lastRating < 6.0) {
+                    p.coachTrust = Math.max(0, p.coachTrust - 2);
+                } else if (p.lastRating > 6.0) {
+                    p.coachTrust = Math.min(100, p.coachTrust + 2);
+                }
+
+                p.money += p.weeklyWage + (p.activeSponsor ? p.activeSponsor.weeklyPay : 0);
+                p.week++;
+                checkSeasonEnd();
+
+                calculateOvr(); calculateRealValue();
+
+                p.historyWeeks.push(p.week); 
+                p.historyOvr.push(p.ovr); 
+                p.historyValue.push(p.value);
+            }
+
+            checkTransferOffer();
+            log(`✅ SİMÜLASYON BİTTİ: +${gCount} Gol, +${aCount} Asist!`);
+            updateUI(); saveGame();
+        }
+
+        function selectAgent(name, fee) {
+            if (p.money >= fee) {
+                p.money -= fee; p.agent = name;
+                log(`💼 Yeni Menajerin: ${name}`);
+                updateUI(); saveGame();
+            } else { alert("Yetersiz Bakiye!"); }
+        }
+
+        function renderAgentTab() {
+            const container = document.getElementById('agent-options-container');
+            if(!container) return; container.innerHTML = "";
+            agentTypesList.forEach(a => {
+                let isCurrent = p.agent === a.name;
+                container.innerHTML += `
+                    <div class="card" style="margin:0; padding:12px; border-color:${isCurrent ? 'var(--gold)' : 'var(--border)'};">
+                        <h4 style="color:${isCurrent ? 'var(--gold)' : 'var(--accent)'}">${a.name} ${isCurrent ? ' (Aktif)' : ''}</h4>
+                        <p style="font-size:0.8rem;">${a.desc}</p>
+                        <p style="font-size:0.78rem; color:var(--gold);">Maliyet: ${formatMoney(a.fee)}</p>
+                        <button class="btn ${isCurrent ? 'btn-gold' : 'btn-purple'}" ${isCurrent ? 'disabled' : ''} onclick="selectAgent('${a.name}', ${a.fee})">
+                            ${isCurrent ? 'Temsilcin' : 'Seç'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function buySkill(id) {
+            let skill = skillTreeSkills.find(s => s.id === id);
+            if (!skill) return;
+
+            if (p.unlockedSkills.includes(id)) {
+                alert("Bu yetenek zaten açıldı!");
+                return;
+            }
+
+            if (p.xp >= skill.cost) {
+                p.xp -= skill.cost;
+                p.unlockedSkills.push(id);
+                
+                if (skill.attr && p[skill.attr] !== undefined) {
+                    p[skill.attr] = Math.min(99, p[skill.attr] + skill.boost);
+                }
+
+                calculateOvr(); calculateRealValue();
+                log(`🌳 YETENEK KİLİDİ AÇILDI: ${skill.name}`);
+                updateUI(); saveGame();
+            } else { alert(`Yetersiz XP! Gereken: ${skill.cost}`); }
+        }
+
+        function renderSkillTree() {
+            const lst = document.getElementById('skill-tree-list'); if(!lst) return; lst.innerHTML = "";
+            let categories = [...new Set(skillTreeSkills.map(s => s.category))];
+
+            categories.forEach(cat => {
+                lst.innerHTML += `<div class="skill-category-title">${cat}</div>`;
+                let categorySkills = skillTreeSkills.filter(s => s.category === cat);
+                categorySkills.forEach(s => {
+                    let isUnlocked = p.unlockedSkills.includes(s.id);
+                    lst.innerHTML += `
+                        <div class="card" style="margin:0; padding:10px; border-color:${isUnlocked ? 'var(--accent)' : 'var(--border)'};">
+                            <h4 style="color:${isUnlocked ? 'var(--accent)' : 'var(--gold)'}; font-size:0.88rem;">${s.name} ${isUnlocked ? '✅' : ''}</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">${s.desc}</p>
+                            <button class="btn ${isUnlocked ? 'btn-gold' : 'btn-purple'}" style="min-height:34px; font-size:0.78rem;" ${isUnlocked ? 'disabled' : ''} onclick="buySkill('${s.id}')">
+                                ${isUnlocked ? 'Açıldı' : `Kilidi Aç (${s.cost} XP)`}
+                            </button>
+                        </div>`;
+                });
+            });
+        }
+
+        function equipBoot(name) {
+            p.equippedBoots = name;
+            log(`👟 Krampon giyildi: ${name}`);
+            updateUI(); saveGame();
+        }
+
+        function renderBoots() {
+            const lst = document.getElementById('boots-list'); if(!lst) return; lst.innerHTML = "";
+            bootsList.forEach((b) => {
+                let isStore = b.isStoreItem;
+                let isOwned = !isStore || p.ownedStoreItems.includes(b.name);
+                let isEquipped = p.equippedBoots === b.name;
+
+                if (isStore && !isOwned) return;
+
+                lst.innerHTML += `
+                    <div class="stat-item" style="margin-bottom:6px;">
+                        <div><strong>${b.name}</strong> <small style="color:var(--gold);">(${b.bonus})</small></div>
+                        <button class="btn ${isEquipped ? 'btn-gold' : 'btn-blue'}" style="width:auto; padding:4px 10px; min-height:32px;" onclick="equipBoot('${b.name}')">
+                            ${isEquipped ? 'Giyildi' : 'Giy'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function checkTransferOffer() {
+            if(Math.random() < 0.5) {
+                let lgs = Object.keys(leagueClubs); let rLg = lgs[Math.floor(Math.random() * lgs.length)];
+                let cls = leagueClubs[rLg].filter(c => c !== p.club); let rCl = cls[Math.floor(Math.random() * cls.length)];
+                let offerWage = Math.floor(p.ovr * 300);
+                p.offers = [{ league: rLg, club: rCl, wage: offerWage }];
+                log(`🚨 TRANSFER TEKLİFİ! ${rCl} seni istiyor! Maaş: ${formatMoney(offerWage)}/Hafta`);
+            }
+        }
+
+        function acceptTransferOffer(league, club) {
+            p.league = league;
+            p.club = club;
+            p.coachTrust = 50;
+            p.contractYears = 3;
+            p.renewedThisSeason = false;
+            if (p.offers[0] && p.offers[0].wage) {
+                p.weeklyWage = p.offers[0].wage;
+            } else {
+                p.weeklyWage = Math.floor(p.ovr * 250);
+            }
+            p.offers = [];
+            generateSquadForClub(p.club);
+            initLeagueTable(); calculateRealValue();
+            log(`🎉 Transfer oldun: ${club}! Maaş: ${formatMoney(p.weeklyWage)}`);
+            updateUI(); saveGame();
+        }
+
+        function renderTransfers() {
+            const lst = document.getElementById('transfer-list'); if(!lst) return;
+            if(!p.offers || p.offers.length === 0) { lst.innerHTML = "Teklif yok."; return; }
+            lst.innerHTML = ""; p.offers.forEach((o) => {
+                lst.innerHTML += `<div class="stat-item"><div><strong>${o.club}</strong> (${o.league}) - Maaş: ${formatMoney(o.wage)}/Hft</div><button class="btn btn-gold" style="width:auto; padding:5px 10px; min-height:34px;" onclick="acceptTransferOffer('${o.league}', '${o.club}')">İmzala</button></div>`;
+            });
+        }
+
+        function buyLifestyleItem(name, price) {
+            if (p.money >= price) {
+                p.money -= price; p.assets.push(name);
+                log(`🏎️ Satın alındı: ${name}`);
+                updateUI(); saveGame();
+            } else { alert("Yetersiz Bakiye!"); }
+        }
+
+        function renderLifestyle() {
+            const lst = document.getElementById('lifestyle-list'); if(!lst) return; lst.innerHTML = "";
+            lifestyleItems.forEach(i => {
+                let b = p.assets.includes(i.name);
+                lst.innerHTML += `<div class="stat-item" style="margin-bottom:6px;"><div><strong>${i.name}</strong> - ${formatMoney(i.price)}</div><button class="btn ${b?'btn-blue':''}" style="width:auto; padding:5px 10px; min-height:32px;" ${b?'disabled':''} onclick="buyLifestyleItem('${i.name}', ${i.price})">${b ? 'Sahipsin' : 'Satın Al'}</button></div>`;
+            });
+        }
+
+        function train(type) {
+            if (p.trainedThisWeek) {
+                alert("Bu hafta zaten antrenman yaptın!");
+                return;
+            }
+            if (p.injuryWeeks > 0) {
+                alert("Sakatken idman yapamazsın!");
+                return;
+            }
+
+            p.xp += 50;
+            p.trainedThisWeek = true;
+
+            if(type === 'fit') { 
+                p.pace = Math.min(99, p.pace + 1); 
+                p.physical = Math.min(99, p.physical + 1); 
+                log("🏋️ Hız & Kondisyon idmanı tamamlandı! (+1 Hız, +1 Fizik, +50 XP)");
+            }
+            else if(type === 'tech') { 
+                p.technique = Math.min(99, (p.technique || 65) + 1); 
+                p.shooting = Math.min(99, p.shooting + 1); 
+                log("🎯 Teknik & Şut idmanı tamamlandı! (+1 Teknik, +1 Şut, +50 XP)");
+            }
+            else if(type === 'tact') { 
+                p.passing = Math.min(99, p.passing + 1); 
+                p.defense = Math.min(99, p.defense + 1); 
+                log("🧠 Taktik idmanı tamamlandı! (+1 Pas, +1 Defans, +50 XP)");
+            }
+            else if(type === 'dribble') { 
+                p.dribble = Math.min(99, p.dribble + 1); 
+                log("⚽ Dripling idmanı tamamlandı! (+1 Çalım, +50 XP)");
+            }
+
+            calculateOvr(); calculateRealValue();
+            updateUI(); saveGame();
+        }
+
+        function renderCharts() {
+            const ctxOvr = document.getElementById('ovrChart');
+            const ctxVal = document.getElementById('valueChart');
+            if (!ctxOvr || !ctxVal) return;
+            if (ovrChartInstance) ovrChartInstance.destroy();
+            if (valueChartInstance) valueChartInstance.destroy();
+
+            ovrChartInstance = new Chart(ctxOvr, {
+                type: 'line',
+                data: { 
+                    labels: p.historyWeeks.map(w => `Hft ${w}`), 
+                    datasets: [{ 
+                        label: 'OVR (GÜÇ)', 
+                        data: p.historyOvr, 
+                        borderColor: '#10b981', 
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }] 
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans' } } } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+
+            valueChartInstance = new Chart(ctxVal, {
+                type: 'line',
+                data: { 
+                    labels: p.historyWeeks.map(w => `Hft ${w}`), 
+                    datasets: [{ 
+                        label: 'Piyasa Değeri (€)', 
+                        data: p.historyValue, 
+                        borderColor: '#fbbf24', 
+                        backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }] 
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans' } } } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+        }
+
+        function log(m) { const b = document.getElementById('logBox'); b.innerHTML += `<br>> ${m}`; b.scrollTop = b.scrollHeight; }
+        
+        function switchTab(t) {
+            ['main', 'squad', 'contract', 'leaderboard', 'store', 'agent', 'chart', 'skilltree', 'attributes', 'life', 'invest', 'coach', 'table', 'train', 'sponsor', 'garage', 'transfer', 'museum'].forEach(x => {
+                let el = document.getElementById(`tab-${x}`);
+                if (el) el.classList.add('hidden');
+            });
+            let targetEl = document.getElementById(`tab-${t}`);
+            if (targetEl) targetEl.classList.remove('hidden'); 
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            if(event && event.target) event.target.classList.add('active');
+            if (t === 'chart') renderCharts();
+            if (t === 'leaderboard') renderLeaderboard();
+            if (t === 'squad') renderSquadUI();
+        }
+
+        window.onload = function() {
+            updateClubOptions();
+        };
+    </script>
+</body>
+</html>
